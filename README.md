@@ -1,100 +1,163 @@
 # Lyra Enterprise
 
-Tema oficial corporativo do Lyra OS para GNOME 48 ou superior. Inclui variantes
-dark e light para GNOME Shell, GTK 4/libadwaita, GTK 3, além de wallpaper em PNG
-e JPEG XL. O visual usa superfícies planas, acento azul-safira único e foco de
-teclado de alto contraste.
+Tema corporativo para GNOME 48+, criado para o Lyra OS e compatível com
+openSUSE, Arch Linux e distribuições derivadas. O projeto oferece uma interface
+sóbria, plana e profissional, com superfícies neutras e acento azul-safira.
 
-## Dependências
+## Componentes
 
-- GNOME 48+
-- `gnome-shell-extension-user-theme` (execução)
-- `sassc` e ImageMagick com suporte a JXL (build)
+- GNOME Shell: painel opaco, Quick Settings, overview, dash, diálogos e OSD
+- GTK 4/libadwaita: cores nomeadas, raio de 8 px e foco acessível
+- GTK 3: port compatível baseado nas convenções do adw-gtk3
+- Variantes `Lyra-Enterprise` e `Lyra-Enterprise-Light`
+- Tema vetorial `Lyra-Enterprise-Icons`, com fallback completo para Adwaita
+- Wallpapers dark e light em PNG e JPEG XL, 3840×2160
+- Pacotes RPM para openSUSE e `PKGBUILD` para Arch/Lyra OS
 
-No Arch/Lyra OS:
+## Instalação rápida
+
+Revise o [install.sh](install.sh) antes de executá-lo. Para instalar e ativar a
+variante dark:
 
 ```bash
-sudo pacman -S gnome-shell-extension-user-theme sassc imagemagick
+curl --proto '=https' --tlsv1.2 -fsSL \
+  https://raw.githubusercontent.com/britors/Lyra-Theme/main/install.sh | bash
 ```
 
-## Build e pacote portátil
+Variante light:
 
 ```bash
+curl --proto '=https' --tlsv1.2 -fsSL \
+  https://raw.githubusercontent.com/britors/Lyra-Theme/main/install.sh | bash -s -- --light
+```
+
+O instalador detecta o gerenciador de pacotes, instala as dependências, compila
+os arquivos, instala tema, ícones e wallpapers e configura a sessão GNOME. A
+senha administrativa é solicitada diretamente pelo terminal.
+
+### Opções
+
+```text
+--dark          instala e ativa a variante dark (padrão)
+--light         instala e ativa a variante light
+--no-activate   instala sem modificar preferências do GNOME
+--uninstall     remove os arquivos e restaura as preferências
+--help          mostra a ajuda
+```
+
+Exemplo para instalar sem ativação automática:
+
+```bash
+curl --proto '=https' --tlsv1.2 -fsSL \
+  https://raw.githubusercontent.com/britors/Lyra-Theme/main/install.sh | bash -s -- --no-activate
+```
+
+## Requisitos
+
+- GNOME 48 ou superior
+- extensão User Themes
+- `curl`, `tar`, `xz`, `sassc`, Node.js e ImageMagick 7 com suporte a JXL
+
+O instalador resolve esses pacotes automaticamente em openSUSE, Arch e
+Debian/Ubuntu.
+
+## Build a partir do repositório
+
+```bash
+git clone https://github.com/britors/Lyra-Theme.git
+cd Lyra-Theme
 ./scripts/build.sh
+./scripts/build-icons.sh
 ./scripts/package.sh
 ```
 
-O primeiro comando recria `dist/`; o segundo gera `Lyra-Enterprise.tar.xz` com
-as duas variantes e os wallpapers. A validação WCAG é executada como parte do
-build. Em ambientes de desenvolvimento sem `sassc`, o script possui um fallback
-limitado aos tokens usados neste projeto; o `PKGBUILD` sempre usa `sassc`.
+Os resultados são gravados em `dist/`. O último comando também gera
+`Lyra-Enterprise.tar.xz`. O build executa automaticamente a validação WCAG das
+paletas dark e light.
 
 ## Instalação manual
 
 ```bash
-sudo install -d /usr/share/themes /usr/share/backgrounds/lyra /usr/share/gnome-background-properties
+sudo install -d /usr/share/themes /usr/share/icons \
+  /usr/share/backgrounds/lyra /usr/share/gnome-background-properties
 sudo cp -a dist/Lyra-Enterprise dist/Lyra-Enterprise-Light /usr/share/themes/
-sudo install -m644 dist/backgrounds/*.{png,jxl} /usr/share/backgrounds/lyra/
-sudo install -m644 dist/gnome-background-properties/lyra-enterprise.xml /usr/share/gnome-background-properties/
+sudo cp -a dist/Lyra-Enterprise-Icons /usr/share/icons/
+sudo install -m 0644 dist/backgrounds/*.{png,jxl} /usr/share/backgrounds/lyra/
+sudo install -m 0644 dist/gnome-background-properties/lyra-enterprise.xml \
+  /usr/share/gnome-background-properties/
 ```
 
-Alternativamente, copie `packaging/PKGBUILD` para um diretório de build, ajuste
-o checksum para a tag publicada e execute `makepkg -si`.
+## Ativação manual
 
-### openSUSE / RPM
-
-O arquivo `packaging/lyra-enterprise-theme.spec` gera um pacote RPM nativo. Com
-as dependências de build instaladas:
+### Dark
 
 ```bash
-rpmbuild -bb packaging/lyra-enterprise-theme.spec
-sudo zypper install ~/rpmbuild/RPMS/noarch/lyra-enterprise-theme-1.0.0-1*.noarch.rpm
-```
-
-## Ativação dark
-
-Ative primeiro a extensão User Themes pelo aplicativo Extensões. Em seguida:
-
-```bash
+gnome-extensions enable user-theme@gnome-shell-extensions.gcampax.github.com
 gsettings set org.gnome.shell.extensions.user-theme name 'Lyra-Enterprise'
 gsettings set org.gnome.desktop.interface gtk-theme 'Lyra-Enterprise'
+gsettings set org.gnome.desktop.interface icon-theme 'Lyra-Enterprise-Icons'
 gsettings set org.gnome.desktop.interface accent-color 'blue'
 gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
 mkdir -p ~/.config/gtk-4.0
-ln -sf /usr/share/themes/Lyra-Enterprise/gtk-4.0/gtk.css ~/.config/gtk-4.0/gtk.css
+ln -sfn /usr/share/themes/Lyra-Enterprise/gtk-4.0/gtk.css \
+  ~/.config/gtk-4.0/gtk.css
 ```
 
-Encerre e abra novamente aplicativos GTK já em execução. Para aplicar ao Shell,
-encerre a sessão e entre novamente caso a extensão não recarregue o tema.
+### Light
 
-## Ativação light
-
-Use `Lyra-Enterprise-Light` nos comandos de Shell, GTK 3 e no caminho do symlink,
-e defina:
+Troque `Lyra-Enterprise` por `Lyra-Enterprise-Light` nos comandos do tema e no
+symlink, e use:
 
 ```bash
 gsettings set org.gnome.desktop.interface color-scheme 'prefer-light'
 ```
 
-## Restaurar o padrão
+Após instalar a extensão User Themes pela primeira vez, encerre a sessão e
+entre novamente para o GNOME Shell atualizar seu catálogo de extensões.
+
+## Pacotes
+
+### openSUSE / RPM
+
+As especificações estão em:
+
+- `packaging/lyra-enterprise-theme.spec`
+- `packaging/lyra-enterprise-icons.spec`
+
+Exemplo de build no ambiente padrão do RPM:
 
 ```bash
-rm ~/.config/gtk-4.0/gtk.css
-gsettings reset org.gnome.shell.extensions.user-theme name
-gsettings reset org.gnome.desktop.interface gtk-theme
-gsettings reset org.gnome.desktop.interface color-scheme
+rpmbuild -bb packaging/lyra-enterprise-theme.spec
+rpmbuild -bb packaging/lyra-enterprise-icons.spec
 ```
 
-Remover o symlink restaura o stylesheet GTK 4/libadwaita sem deixar arquivos do
-tema na configuração do usuário. O pacote não executa hooks nem altera qualquer
-preferência automaticamente.
+### Arch Linux / Lyra OS
 
-## Fonte opcional
+Use `packaging/PKGBUILD` com `makepkg -si`. O pacote declara a extensão User
+Themes como dependência e não executa hooks que alterem configurações pessoais.
 
-O tema não impõe fontes. Para usar Inter, instale-a separadamente e ajuste pelas
-Configurações/Ajustes do GNOME ou via `gsettings` conforme a política local.
+## Estrutura
+
+```text
+src/shell/       tokens SCSS e tema GNOME Shell
+src/gtk4/        overrides GTK 4/libadwaita
+src/gtk3/        port GTK 3 e atribuição LGPL
+src/icons/       tema de ícones SVG
+src/wallpaper/   fonte vetorial e metadados GNOME
+scripts/         build, validação e empacotamento
+packaging/       PKGBUILD e especificações RPM
+```
+
+## Desinstalação
+
+```bash
+curl --proto '=https' --tlsv1.2 -fsSL \
+  https://raw.githubusercontent.com/britors/Lyra-Theme/main/install.sh | bash -s -- --uninstall
+```
 
 ## Licenças
 
-O projeto é GPL-3.0-or-later. O componente GTK 3 preserva LGPL-2.1-or-later e a
-atribuição ao adw-gtk3 em `src/gtk3/ATTRIBUTION.md`.
+O projeto é distribuído sob GPL-3.0-or-later. O componente GTK 3 mantém
+LGPL-2.1-or-later e a atribuição ao adw-gtk3 em
+`src/gtk3/ATTRIBUTION.md`. O tema não substitui fontes, não modifica GDM e não
+altera configurações do usuário durante a instalação por pacote.
