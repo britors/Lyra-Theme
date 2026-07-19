@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3840" height="2160" viewBox="0 0 3840 2160">
+  <title>Lyra Enterprise</title>
+  <desc>Flat angular corporate wallpaper for Lyra OS</desc>
+  <rect width="3840" height="2160" fill="@ENT_BG@"/>
+  <g fill="none" stroke="@ENT_BORDER@" stroke-width="2" opacity="0.46">
+    <path d="M0 310H920L1280 670H2140L2500 310H3840"/>
+    <path d="M0 720H640L1050 1130H1950L2320 760H3840"/>
+    <path d="M0 1650H760L1170 1240H2110L2520 1650H3840"/>
+    <path d="M0 1980H1120L1450 1650H2240L2570 1980H3840"/>
+  </g>
+  <g fill="@ENT_SURFACE@" opacity="0.72">
+    <path d="M0 0h1210L790 420H0z"/>
+    <path d="M3840 2160H2580l430-430h830z"/>
+  </g>
+  <g transform="translate(3390 1755)" fill="none" stroke="@ENT_TEXT@" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" opacity="0.07">
+    <path d="M80 30v300c0 57 47 104 104 104s104-47 104-104V30"/>
+    <path d="M80 92h208M80 172h208M80 252h208M184 434v75M112 509h144"/>
+  </g>
+</svg>

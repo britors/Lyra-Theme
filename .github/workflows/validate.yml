@@ -1,0 +1,15 @@
+name: validate
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y sassc imagemagick
+      - run: ./scripts/build.sh
+      - run: ./scripts/package.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Lyra-Enterprise
+          path: Lyra-Enterprise.tar.xz
+

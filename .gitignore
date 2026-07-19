@@ -1,0 +1,5 @@
+dist/
+pkg/
+.rpmbuild/
+src/*.tar.*
+*.pkg.tar.*

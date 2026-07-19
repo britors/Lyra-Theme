@@ -1,0 +1,30 @@
+# Maintainer: Lyra OS Team <contact@lyraos.dev>
+pkgname=lyra-enterprise-theme
+pkgver=1.0.0
+pkgrel=1
+pkgdesc='Corporate GNOME Shell, GTK and wallpaper theme for Lyra OS'
+arch=('any')
+url='https://github.com/britors/lyra-enterprise-theme'
+license=('GPL-3.0-or-later' 'LGPL-2.1-or-later')
+depends=('gnome-shell-extension-user-theme')
+makedepends=('git' 'sassc' 'imagemagick')
+source=("git+$url.git#tag=v$pkgver")
+sha256sums=('SKIP')
+
+build() {
+  cd "$srcdir/lyra-enterprise-theme"
+  ./scripts/build.sh
+}
+
+package() {
+  cd "$srcdir/lyra-enterprise-theme"
+  install -d "$pkgdir/usr/share/themes" "$pkgdir/usr/share/backgrounds/lyra" \
+    "$pkgdir/usr/share/gnome-background-properties" "$pkgdir/usr/share/licenses/$pkgname"
+  cp -a dist/Lyra-Enterprise dist/Lyra-Enterprise-Light "$pkgdir/usr/share/themes/"
+  install -m644 dist/backgrounds/*.{png,jxl} "$pkgdir/usr/share/backgrounds/lyra/"
+  install -m644 dist/gnome-background-properties/lyra-enterprise.xml \
+    "$pkgdir/usr/share/gnome-background-properties/"
+  install -m644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+  install -m644 src/gtk3/COPYING.LGPL "$pkgdir/usr/share/licenses/$pkgname/COPYING.LGPL"
+  install -m644 src/gtk3/ATTRIBUTION.md "$pkgdir/usr/share/licenses/$pkgname/GTK3-ATTRIBUTION.md"
+}

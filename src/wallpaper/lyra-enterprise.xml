@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE wallpapers SYSTEM "gnome-wp-list.dtd">
+<wallpapers>
+  <wallpaper deleted="false">
+    <name>Lyra Enterprise</name>
+    <filename>/usr/share/backgrounds/lyra/enterprise-light.png</filename>
+    <filename-dark>/usr/share/backgrounds/lyra/enterprise.png</filename-dark>
+    <options>zoom</options>
+    <shade_type>solid</shade_type>
+    <pcolor>#F4F5F7</pcolor>
+    <scolor>#16191D</scolor>
+  </wallpaper>
+</wallpapers>
+
