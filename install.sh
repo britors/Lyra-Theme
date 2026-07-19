@@ -70,6 +70,9 @@ install_dependencies() {
   elif command -v pacman >/dev/null 2>&1; then
     sudo pacman -S --needed --noconfirm \
       curl tar xz imagemagick nodejs sassc gnome-shell-extension-user-theme
+  elif command -v dnf >/dev/null 2>&1; then
+    sudo dnf install -y \
+      curl tar xz ImageMagick nodejs sassc gnome-shell-extension-user-theme
   elif command -v apt-get >/dev/null 2>&1; then
     sudo apt-get update
     sudo apt-get install -y curl tar xz-utils imagemagick nodejs sassc \

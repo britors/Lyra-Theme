@@ -1,6 +1,6 @@
 # Lyra Enterprise
 
-Tema corporativo para GNOME 48+, criado para o Lyra OS e compatível com
+Tema corporativo para GNOME 48+, criado para o Lyra OS e compatível com Fedora,
 openSUSE, Arch Linux e distribuições derivadas. O projeto oferece uma interface
 sóbria, plana e profissional, com superfícies neutras e acento azul-safira.
 
@@ -58,7 +58,7 @@ curl --proto '=https' --tlsv1.2 -fsSL \
 - extensão User Themes
 - `curl`, `tar`, `xz`, `sassc`, Node.js e ImageMagick 7 com suporte a JXL
 
-O instalador resolve esses pacotes automaticamente em openSUSE, Arch e
+O instalador resolve esses pacotes automaticamente em Fedora, openSUSE, Arch e
 Debian/Ubuntu.
 
 ## Build a partir do repositório
@@ -116,6 +116,30 @@ Após instalar a extensão User Themes pela primeira vez, encerre a sessão e
 entre novamente para o GNOME Shell atualizar seu catálogo de extensões.
 
 ## Pacotes
+
+### Fedora / RPM
+
+O Fedora recebe um único pacote com temas, ícones e wallpapers. A especificação
+está em `packaging/lyra-enterprise-fedora.spec`.
+
+Para instalar o RPM pré-compilado incluído no repositório:
+
+```bash
+sudo dnf install ./lyra-enterprise-1.0.0-1.noarch.rpm
+```
+
+SHA-256: `c239e72a88d26c6db39972c2c5b78599f01ea9f21cf40c927e987f7e55bf28ff`
+
+Para reconstruí-lo no Fedora:
+
+```bash
+sudo dnf install -y rpm-build rpmdevtools ImageMagick nodejs sassc \
+  gnome-shell-extension-user-theme
+rpmdev-setuptree
+cp packaging/lyra-enterprise-fedora.spec ~/rpmbuild/SPECS/
+rpmbuild -bb ~/rpmbuild/SPECS/lyra-enterprise-fedora.spec
+sudo dnf install ~/rpmbuild/RPMS/noarch/lyra-enterprise-1.0.0-1*.noarch.rpm
+```
 
 ### openSUSE / RPM
 
