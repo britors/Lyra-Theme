@@ -1,7 +1,7 @@
 Name:           lyra-enterprise
-Version:        1.0.0
+Version:        1.1.0
 Release:        1%{?dist}
-Summary:        Corporate GNOME theme, icons and wallpapers for Lyra OS
+Summary:        Corporate GNOME and GRUB theme, icons and wallpapers for Lyra OS
 License:        GPL-3.0-or-later AND LGPL-2.1-or-later
 URL:            https://github.com/britors/Lyra-Theme
 Source0:        %{url}/archive/v%{version}/Lyra-Theme-%{version}.tar.gz
@@ -11,12 +11,12 @@ BuildRequires:  ImageMagick
 BuildRequires:  nodejs
 BuildRequires:  sassc
 Requires:       adwaita-icon-theme
-Requires:       gnome-shell-extension-user-theme
 
 %description
 Lyra Enterprise is a flat corporate theme for GNOME 48 and newer. This package
 contains dark and light GNOME Shell, GTK 4 and GTK 3 themes, a scalable icon
 theme inheriting Adwaita, and matching 4K wallpapers in PNG and JPEG XL.
+It also provides a matching GRUB 2 boot menu theme.
 
 %prep
 %autosetup -n Lyra-Theme-%{version}
@@ -41,6 +41,9 @@ install -d %{buildroot}%{_datadir}/gnome-background-properties
 install -m 0644 dist/gnome-background-properties/lyra-enterprise.xml \
   %{buildroot}%{_datadir}/gnome-background-properties/
 
+install -d %{buildroot}%{_datadir}/grub/themes
+cp -a dist/grub/Lyra-Enterprise %{buildroot}%{_datadir}/grub/themes/
+
 %files
 %license LICENSE src/gtk3/COPYING.LGPL
 %doc README.md src/gtk3/ATTRIBUTION.md
@@ -52,8 +55,12 @@ install -m 0644 dist/gnome-background-properties/lyra-enterprise.xml \
 %{_datadir}/backgrounds/lyra/enterprise-light.png
 %{_datadir}/backgrounds/lyra/enterprise-light.jxl
 %{_datadir}/gnome-background-properties/lyra-enterprise.xml
+%{_datadir}/grub/themes/Lyra-Enterprise/
 
 %changelog
+* Sun Jul 19 2026 Lyra OS Team <contact@lyraos.dev> - 1.1.0-1
+- Keep Adwaita active by default and apply Lyra icons and wallpapers
+- Add the Lyra Enterprise GRUB theme
+
 * Sun Jul 19 2026 Lyra OS Team <contact@lyraos.dev> - 1.0.0-1
 - Initial Fedora package with themes, icons and wallpapers
-

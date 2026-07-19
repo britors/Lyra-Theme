@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+  <title>Lyra Enterprise GRUB</title>
+  <rect width="1920" height="1080" fill="#0b1018"/>
+  <path d="M0 0h610L398 212H0zm1920 1080h-630l215-215h415z" fill="#111925"/>
+  <g fill="none" stroke="#26364c" opacity=".58">
+    <path d="M0 154h460l180 180h430l180-180h670"/>
+    <path d="M0 360h320l205 205h450l185-185h760"/>
+    <path d="M0 825h380l205-205h470l205 205h660"/>
+    <path d="M0 990h560l165-165h395l165 165h635"/>
+  </g>
+  <rect x="490" y="245" width="940" height="590" rx="18" fill="#111925" stroke="#26364c"/>
+  <rect x="490" y="245" width="6" height="590" rx="3" fill="#3b82f6"/>
+  <g transform="translate(870 137)" fill="none" stroke="#e7edf6" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M0 0v60c0 44 36 80 80 80s80-36 80-80V0"/>
+    <path d="M0 22h160M0 52h160M80 140v30M50 170h60"/>
+  </g>
+  <text x="960" y="105" fill="#e7edf6" font-family="DejaVu Sans, sans-serif" font-size="24" text-anchor="middle" letter-spacing="5">LYRA OS</text>
+  <text x="960" y="920" fill="#8391a5" font-family="DejaVu Sans, sans-serif" font-size="16" text-anchor="middle">Enterprise boot environment</text>
+</svg>

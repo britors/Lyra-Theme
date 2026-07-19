@@ -1,23 +1,21 @@
 # Lyra Enterprise
 
-Tema corporativo para GNOME 48+, criado para o Lyra OS e compatível com Fedora,
-openSUSE, Arch Linux e distribuições derivadas. O projeto oferece uma interface
-sóbria, plana e profissional, com superfícies neutras e acento azul-safira.
+Identidade visual para GNOME 48+, criada para o Lyra OS e compatível com Fedora,
+openSUSE, Arch Linux e distribuições derivadas. A configuração recomendada usa
+Adwaita no Shell e nos aplicativos, com ícones e wallpapers Lyra Enterprise.
 
 ## Componentes
 
-- GNOME Shell: painel opaco, Quick Settings, overview, dash, diálogos e OSD
-- GTK 4/libadwaita: cores nomeadas, raio de 8 px e foco acessível
-- GTK 3: port compatível baseado nas convenções do adw-gtk3
-- Variantes `Lyra-Enterprise` e `Lyra-Enterprise-Light`
+- Adwaita nativo para GNOME Shell, GTK 4/libadwaita e GTK 3
 - Tema vetorial `Lyra-Enterprise-Icons`, com fallback completo para Adwaita
 - Wallpapers dark e light em PNG e JPEG XL, 3840×2160
+- Tema do GRUB 2 com fundo Full HD e menu de boot Lyra Enterprise
 - Pacotes RPM para openSUSE e `PKGBUILD` para Arch/Lyra OS
 
 ## Instalação rápida
 
-Revise o [install.sh](install.sh) antes de executá-lo. Para instalar e ativar a
-variante dark:
+Revise o [install.sh](install.sh) antes de executá-lo. Para usar Adwaita escuro
+com ícones e wallpaper Lyra Enterprise:
 
 ```bash
 curl --proto '=https' --tlsv1.2 -fsSL \
@@ -32,15 +30,16 @@ curl --proto '=https' --tlsv1.2 -fsSL \
 ```
 
 O instalador detecta o gerenciador de pacotes, instala as dependências, compila
-os arquivos, instala tema, ícones e wallpapers e configura a sessão GNOME. A
+os arquivos, instala tema, ícones, wallpapers e GRUB e configura a sessão GNOME
+e o menu de boot. A
 senha administrativa é solicitada diretamente pelo terminal.
 
 ### Opções
 
 ```text
---dark          instala e ativa a variante dark (padrão)
---light         instala e ativa a variante light
---no-activate   instala sem modificar preferências do GNOME
+--dark          usa Adwaita escuro com ícones e wallpaper Lyra (padrão)
+--light         usa Adwaita claro com ícones e wallpaper Lyra
+--no-activate   instala sem modificar preferências do GNOME ou do GRUB
 --uninstall     remove os arquivos e restaura as preferências
 --help          mostra a ajuda
 ```
@@ -55,7 +54,6 @@ curl --proto '=https' --tlsv1.2 -fsSL \
 ## Requisitos
 
 - GNOME 48 ou superior
-- extensão User Themes
 - `curl`, `tar`, `xz`, `sassc`, Node.js e ImageMagick 7 com suporte a JXL
 
 O instalador resolve esses pacotes automaticamente em Fedora, openSUSE, Arch e
@@ -79,41 +77,53 @@ paletas dark e light.
 
 ```bash
 sudo install -d /usr/share/themes /usr/share/icons \
-  /usr/share/backgrounds/lyra /usr/share/gnome-background-properties
+  /usr/share/backgrounds/lyra /usr/share/gnome-background-properties \
+  /usr/share/grub/themes
 sudo cp -a dist/Lyra-Enterprise dist/Lyra-Enterprise-Light /usr/share/themes/
 sudo cp -a dist/Lyra-Enterprise-Icons /usr/share/icons/
 sudo install -m 0644 dist/backgrounds/*.{png,jxl} /usr/share/backgrounds/lyra/
 sudo install -m 0644 dist/gnome-background-properties/lyra-enterprise.xml \
   /usr/share/gnome-background-properties/
+sudo cp -a dist/grub/Lyra-Enterprise /usr/share/grub/themes/
 ```
 
 ## Ativação manual
 
-### Dark
+### Adwaita com ícones Lyra Enterprise
 
 ```bash
-gnome-extensions enable user-theme@gnome-shell-extensions.gcampax.github.com
-gsettings set org.gnome.shell.extensions.user-theme name 'Lyra-Enterprise'
-gsettings set org.gnome.desktop.interface gtk-theme 'Lyra-Enterprise'
+gsettings reset org.gnome.shell.extensions.user-theme name
+gsettings reset org.gnome.desktop.interface gtk-theme
 gsettings set org.gnome.desktop.interface icon-theme 'Lyra-Enterprise-Icons'
 gsettings set org.gnome.desktop.interface accent-color 'blue'
 gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
-mkdir -p ~/.config/gtk-4.0
-ln -sfn /usr/share/themes/Lyra-Enterprise/gtk-4.0/gtk.css \
-  ~/.config/gtk-4.0/gtk.css
 ```
 
-### Light
+O GNOME Shell e os aplicativos permanecem no Adwaita padrão; somente os ícones
+são fornecidos pelo Lyra Enterprise. Isso mantém compatibilidade integral com
+os controles rápidos das versões atuais do GNOME.
 
-Troque `Lyra-Enterprise` por `Lyra-Enterprise-Light` nos comandos do tema e no
-symlink, e use:
+### Variante clara
+
+Use:
 
 ```bash
 gsettings set org.gnome.desktop.interface color-scheme 'prefer-light'
 ```
 
-Após instalar a extensão User Themes pela primeira vez, encerre a sessão e
-entre novamente para o GNOME Shell atualizar seu catálogo de extensões.
+### GRUB
+
+O instalador ativa o tema em `/etc/default/grub` e regenera o `grub.cfg`. Para
+ativá-lo manualmente, acrescente:
+
+```bash
+GRUB_THEME="/usr/share/grub/themes/Lyra-Enterprise/theme.txt"
+```
+
+Depois execute `sudo update-grub` (Debian/Ubuntu), ou
+`sudo grub2-mkconfig -o /boot/grub2/grub.cfg` (Fedora/openSUSE), ou
+`sudo grub-mkconfig -o /boot/grub/grub.cfg` (Arch). O instalador só remove essa
+configuração na desinstalação se ela ainda apontar para o tema Lyra.
 
 ## Pacotes
 
@@ -134,11 +144,11 @@ Para reconstruí-lo no Fedora:
 
 ```bash
 sudo dnf install -y rpm-build rpmdevtools ImageMagick nodejs sassc \
-  gnome-shell-extension-user-theme
+  adwaita-icon-theme
 rpmdev-setuptree
 cp packaging/lyra-enterprise-fedora.spec ~/rpmbuild/SPECS/
 rpmbuild -bb ~/rpmbuild/SPECS/lyra-enterprise-fedora.spec
-sudo dnf install ~/rpmbuild/RPMS/noarch/lyra-enterprise-1.0.0-1*.noarch.rpm
+sudo dnf install ~/rpmbuild/RPMS/noarch/lyra-enterprise-1.1.0-1*.noarch.rpm
 ```
 
 ### openSUSE / RPM
@@ -157,8 +167,8 @@ rpmbuild -bb packaging/lyra-enterprise-icons.spec
 
 ### Arch Linux / Lyra OS
 
-Use `packaging/PKGBUILD` com `makepkg -si`. O pacote declara a extensão User
-Themes como dependência e não executa hooks que alterem configurações pessoais.
+Use `packaging/PKGBUILD` com `makepkg -si`. O pacote usa Adwaita como fallback
+dos ícones e não executa hooks que alterem configurações pessoais.
 
 ## Estrutura
 
@@ -168,6 +178,7 @@ src/gtk4/        overrides GTK 4/libadwaita
 src/gtk3/        port GTK 3 e atribuição LGPL
 src/icons/       tema de ícones SVG
 src/wallpaper/   fonte vetorial e metadados GNOME
+src/grub/        tema, fundo e seleção do menu GRUB
 scripts/         build, validação e empacotamento
 packaging/       PKGBUILD e especificações RPM
 ```

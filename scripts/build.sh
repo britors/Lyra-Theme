@@ -17,12 +17,16 @@ compile_scss() {
   # Minimal deterministic fallback for release builders without sassc. Sources
   # intentionally use only variables supported here; Arch packaging uses sassc.
   cp "$source" "$output"
-  while IFS= read -r line; do
-    [[ $line =~ ^\$([a-zA-Z0-9_-]+):[[:space:]]*(.*)\;$ ]] || continue
-    name=${BASH_REMATCH[1]}
-    value=${BASH_REMATCH[2]}
-    sed -i "s|#{\$$name}|$value|g; s|\$$name|$value|g" "$output"
-  done < "$tokens"
+  # Replace longer variable names first so, for example, $ent-surface does
+  # not corrupt $ent-surface-raised. A second pass resolves token aliases.
+  for _ in 1 2; do
+    while IFS= read -r line; do
+      [[ $line =~ ^\$([a-zA-Z0-9_-]+):[[:space:]]*(.*)\;$ ]] || continue
+      name=${BASH_REMATCH[1]}
+      value=${BASH_REMATCH[2]}
+      sed -i "s|#{\$$name}|$value|g; s|\$$name|$value|g" "$output"
+    done < <(awk '{ print length, $0 }' "$tokens" | sort -rn | cut -d' ' -f2-)
+  done
 }
 
 token_value() {
@@ -51,6 +55,7 @@ for variant in Lyra-Enterprise Lyra-Enterprise-Light; do
     "$dist/$variant/gtk-3.0"
 done
 mkdir -p "$dist/backgrounds" "$dist/gnome-background-properties"
+mkdir -p "$dist/grub/Lyra-Enterprise"
 
 compile_scss "$root/src/shell/_tokens-dark.scss" "$root/src/shell/gnome-shell.scss" \
   "$dist/Lyra-Enterprise/gnome-shell/gnome-shell.css"
@@ -64,6 +69,15 @@ command -v magick >/dev/null 2>&1 || { echo 'error: ImageMagick is required' >&2
 render_wallpaper "$root/src/shell/_tokens-dark.scss" enterprise
 render_wallpaper "$root/src/shell/_tokens-light.scss" enterprise-light
 cp "$root/src/wallpaper/lyra-enterprise.xml" "$dist/gnome-background-properties/"
+
+cp "$root/src/grub/theme.txt" "$dist/grub/Lyra-Enterprise/"
+magick -background none "$root/src/grub/background.svg" -resize 1920x1080! \
+  -strip -define png:color-type=2 "$dist/grub/Lyra-Enterprise/background.png"
+# GRUB stretches the middle segment between the fixed left/right caps.
+for part in c e n ne nw s se sw w; do
+  magick -background none "$root/src/grub/select.svg" -resize 2x2! -strip \
+    "$dist/grub/Lyra-Enterprise/select_${part}.png"
+done
 
 "$root/scripts/check-contrast.js"
 printf 'Built Lyra Enterprise in %s\n' "$dist"

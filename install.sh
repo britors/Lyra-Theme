@@ -13,9 +13,9 @@ Lyra Enterprise installer
 
 Usage: install.sh [--dark|--light] [--no-activate] [--uninstall]
 
-  --dark          Install and activate Lyra-Enterprise (default)
-  --light         Install and activate Lyra-Enterprise-Light
-  --no-activate   Install files without changing GNOME preferences
+  --dark          Use dark Adwaita with Lyra Enterprise icons (default)
+  --light         Use light Adwaita with Lyra Enterprise icons
+  --no-activate   Install files without changing GNOME or GRUB settings
   --uninstall     Remove both themes and restore GNOME defaults
 EOF
 }
@@ -35,6 +35,34 @@ done
 say() { printf '\033[1;34m==>\033[0m %s\n' "$*"; }
 die() { printf '\033[1;31merror:\033[0m %s\n' "$*" >&2; exit 1; }
 
+rebuild_grub_config() {
+  local update_grub grub_mkconfig
+  update_grub=$(command -v update-grub 2>/dev/null || true)
+  grub_mkconfig=$(command -v grub2-mkconfig 2>/dev/null || \
+    command -v grub-mkconfig 2>/dev/null || true)
+  [[ -n $update_grub ]] || [[ ! -x /usr/sbin/update-grub ]] || \
+    update_grub=/usr/sbin/update-grub
+  if [[ -z $grub_mkconfig ]]; then
+    if [[ -x /usr/sbin/grub2-mkconfig ]]; then
+      grub_mkconfig=/usr/sbin/grub2-mkconfig
+    elif [[ -x /usr/sbin/grub-mkconfig ]]; then
+      grub_mkconfig=/usr/sbin/grub-mkconfig
+    fi
+  fi
+
+  if [[ -n $update_grub ]]; then
+    sudo "$update_grub"
+  elif [[ -n $grub_mkconfig ]]; then
+    if [[ -d /boot/grub2 ]]; then
+      sudo "$grub_mkconfig" -o /boot/grub2/grub.cfg
+    else
+      sudo "$grub_mkconfig" -o /boot/grub/grub.cfg
+    fi
+  else
+    say 'GRUB configuration tool not found; regenerate grub.cfg manually'
+  fi
+}
+
 command -v sudo >/dev/null 2>&1 || die 'sudo is required'
 if ! sudo -n true 2>/dev/null; then
   say 'Administrator authentication is required'
@@ -45,7 +73,8 @@ if ((uninstall)); then
   say 'Removing Lyra Enterprise'
   sudo rm -rf /usr/share/themes/Lyra-Enterprise \
     /usr/share/themes/Lyra-Enterprise-Light \
-    /usr/share/icons/Lyra-Enterprise-Icons
+    /usr/share/icons/Lyra-Enterprise-Icons \
+    /usr/share/grub/themes/Lyra-Enterprise
   sudo rm -f /usr/share/backgrounds/lyra/enterprise.png \
     /usr/share/backgrounds/lyra/enterprise-light.png \
     /usr/share/backgrounds/lyra/enterprise.jxl \
@@ -58,6 +87,15 @@ if ((uninstall)); then
     gsettings reset org.gnome.desktop.interface icon-theme 2>/dev/null || true
     gsettings reset org.gnome.desktop.interface color-scheme 2>/dev/null || true
   fi
+  if ((activate)) && [[ -f /etc/default/grub ]] && \
+      sudo grep -qx 'GRUB_THEME="/usr/share/grub/themes/Lyra-Enterprise/theme.txt"' /etc/default/grub; then
+    sudo sed -i '\|^GRUB_THEME="/usr/share/grub/themes/Lyra-Enterprise/theme.txt"$|d' /etc/default/grub
+    if [[ -s /etc/default/grub.lyra-theme-backup ]]; then
+      sudo sh -c 'cat /etc/default/grub.lyra-theme-backup >> /etc/default/grub'
+    fi
+    sudo rm -f /etc/default/grub.lyra-theme-backup
+    rebuild_grub_config
+  fi
   say 'Uninstall complete'
   exit 0
 fi
@@ -66,19 +104,18 @@ install_dependencies() {
   say 'Installing build and runtime dependencies'
   if command -v zypper >/dev/null 2>&1; then
     sudo zypper --non-interactive install \
-      curl tar xz ImageMagick nodejs sassc gnome-shell-extension-user-theme
+      curl tar xz ImageMagick nodejs sassc
   elif command -v pacman >/dev/null 2>&1; then
     sudo pacman -S --needed --noconfirm \
-      curl tar xz imagemagick nodejs sassc gnome-shell-extension-user-theme
+      curl tar xz imagemagick nodejs sassc
   elif command -v dnf >/dev/null 2>&1; then
     sudo dnf install -y \
-      curl tar xz ImageMagick nodejs sassc gnome-shell-extension-user-theme
+      curl tar xz ImageMagick nodejs sassc
   elif command -v apt-get >/dev/null 2>&1; then
     sudo apt-get update
-    sudo apt-get install -y curl tar xz-utils imagemagick nodejs sassc \
-      gnome-shell-extension-user-theme
+    sudo apt-get install -y curl tar xz-utils imagemagick nodejs sassc
   else
-    die 'Unsupported distribution. Install curl, tar, xz, ImageMagick, nodejs, sassc and User Themes manually.'
+    die 'Unsupported distribution. Install curl, tar, xz, ImageMagick, nodejs and sassc manually.'
   fi
 }
 
@@ -97,12 +134,13 @@ curl --proto '=https' --tlsv1.2 -fsSL \
   "https://github.com/$repo/archive/$ref.tar.gz" -o "$archive"
 tar -xzf "$archive" -C "$source_dir" --strip-components=1
 
-say 'Building themes, icons and wallpapers'
+say 'Building themes, icons, wallpapers and GRUB theme'
 (cd "$source_dir" && ./scripts/build.sh && ./scripts/build-icons.sh)
 
 say 'Installing system files'
 sudo install -d /usr/share/themes /usr/share/icons \
-  /usr/share/backgrounds/lyra /usr/share/gnome-background-properties
+  /usr/share/backgrounds/lyra /usr/share/gnome-background-properties \
+  /usr/share/grub/themes
 sudo cp -a "$source_dir/dist/Lyra-Enterprise" \
   "$source_dir/dist/Lyra-Enterprise-Light" /usr/share/themes/
 sudo cp -a "$source_dir/dist/Lyra-Enterprise-Icons" /usr/share/icons/
@@ -111,20 +149,19 @@ sudo install -m 0644 "$source_dir"/dist/backgrounds/*.{png,jxl} \
 sudo install -m 0644 \
   "$source_dir/dist/gnome-background-properties/lyra-enterprise.xml" \
   /usr/share/gnome-background-properties/
+sudo cp -a "$source_dir/dist/grub/Lyra-Enterprise" /usr/share/grub/themes/
 command -v gtk-update-icon-cache >/dev/null 2>&1 && \
   sudo gtk-update-icon-cache -f /usr/share/icons/Lyra-Enterprise-Icons >/dev/null || true
 
 if ((activate)) && command -v gsettings >/dev/null 2>&1; then
   if [[ $variant == light ]]; then
-    theme=Lyra-Enterprise-Light
     scheme=prefer-light
   else
-    theme=Lyra-Enterprise
     scheme=prefer-dark
   fi
-  say "Activating $theme"
-  gsettings set org.gnome.shell.extensions.user-theme name "$theme"
-  gsettings set org.gnome.desktop.interface gtk-theme "$theme"
+  say 'Activating Adwaita with Lyra Enterprise icons'
+  gsettings reset org.gnome.shell.extensions.user-theme name 2>/dev/null || true
+  gsettings reset org.gnome.desktop.interface gtk-theme 2>/dev/null || true
   gsettings set org.gnome.desktop.interface icon-theme 'Lyra-Enterprise-Icons'
   gsettings set org.gnome.desktop.interface accent-color 'blue' 2>/dev/null || true
   gsettings set org.gnome.desktop.interface color-scheme "$scheme"
@@ -132,22 +169,25 @@ if ((activate)) && command -v gsettings >/dev/null 2>&1; then
     'file:///usr/share/backgrounds/lyra/enterprise-light.png'
   gsettings set org.gnome.desktop.background picture-uri-dark \
     'file:///usr/share/backgrounds/lyra/enterprise.png'
-  mkdir -p "$HOME/.config/gtk-4.0"
-  ln -sfn "/usr/share/themes/$theme/gtk-4.0/gtk.css" \
-    "$HOME/.config/gtk-4.0/gtk.css"
-  uuid=user-theme@gnome-shell-extensions.gcampax.github.com
-  if ! gnome-extensions enable "$uuid" 2>/dev/null; then
-    current=$(gsettings get org.gnome.shell enabled-extensions)
-    if [[ $current != *"'$uuid'"* ]]; then
-      if [[ $current == '@as []' || $current == '[]' ]]; then
-        updated="['$uuid']"
-      else
-        updated=$(printf '%s' "$current" | sed "s/]$/, '$uuid']/")
-      fi
-      gsettings set org.gnome.shell enabled-extensions "$updated"
+  if [[ $(readlink "$HOME/.config/gtk-4.0/gtk.css" 2>/dev/null || true) == /usr/share/themes/Lyra-Enterprise* ]]; then
+    rm -f "$HOME/.config/gtk-4.0/gtk.css"
+  fi
+fi
+
+if ((activate)); then
+  if [[ -f /etc/default/grub ]]; then
+    say 'Activating Lyra Enterprise for GRUB'
+    if ! sudo grep -qx 'GRUB_THEME="/usr/share/grub/themes/Lyra-Enterprise/theme.txt"' /etc/default/grub; then
+      sudo sh -c "grep '^[[:space:]]*GRUB_THEME=' /etc/default/grub > /etc/default/grub.lyra-theme-backup || true"
     fi
+    sudo sed -i '/^[[:space:]]*GRUB_THEME=/d' /etc/default/grub
+    printf '%s\n' 'GRUB_THEME="/usr/share/grub/themes/Lyra-Enterprise/theme.txt"' | \
+      sudo tee -a /etc/default/grub >/dev/null
+    rebuild_grub_config
+  else
+    say '/etc/default/grub not found; GRUB theme was installed but not activated'
   fi
 fi
 
 say 'Lyra Enterprise installation complete'
-printf 'Log out and back in once so GNOME Shell can load a newly installed User Themes extension.\n'
+printf 'Adwaita remains active for GNOME Shell and applications; Lyra supplies the icons.\n'

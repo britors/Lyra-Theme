@@ -1,5 +1,5 @@
 Name:           lyra-enterprise-icons
-Version:        1.0.0
+Version:        1.1.0
 Release:        1%{?dist}
 Summary:        Flat sapphire icon theme for Lyra Enterprise
 License:        GPL-3.0-or-later
@@ -27,6 +27,8 @@ cp -a dist/Lyra-Enterprise-Icons %{buildroot}%{_datadir}/icons/
 %{_datadir}/icons/Lyra-Enterprise-Icons/
 
 %changelog
+* Sun Jul 19 2026 Lyra OS Team <contact@lyraos.dev> - 1.1.0-1
+- Release icons for Lyra Enterprise 1.1.0
+
 * Sun Jul 19 2026 Lyra OS Team <contact@lyraos.dev> - 1.0.0-1
 - Initial enterprise icon theme
-

@@ -1,0 +1,53 @@
+# Lyra Enterprise GRUB theme — designed for 1920x1080 and scalable layouts.
+title-text: ""
+desktop-image: "background.png"
+desktop-color: "#0b1018"
+terminal-box: "0,0,0,0"
+terminal-border: "0"
+
++ boot_menu {
+  left = 28%
+  top = 30%
+  width = 44%
+  height = 42%
+  item_font = "DejaVu Sans Regular 18"
+  item_color = "#aab6c8"
+  selected_item_font = "DejaVu Sans Bold 18"
+  selected_item_color = "#ffffff"
+  selected_item_pixmap_style = "select_*.png"
+  item_height = 44
+  item_padding = 14
+  item_spacing = 8
+  icon_width = 28
+  icon_height = 28
+  scrollbar = false
+}
+
++ label {
+  text = "Select an operating system"
+  left = 29%
+  top = 25%
+  color = "#8391a5"
+  font = "DejaVu Sans Regular 14"
+}
+
++ label {
+  id = "__timeout__"
+  text = "Starting in %d seconds"
+  left = 0
+  top = 78%
+  width = 100%
+  align = "center"
+  color = "#8391a5"
+  font = "DejaVu Sans Regular 14"
+}
+
++ label {
+  text = "Enter: boot   •   ↑↓: navigate   •   E: edit   •   C: console"
+  left = 0
+  top = 82%
+  width = 100%
+  align = "center"
+  color = "#64748b"
+  font = "DejaVu Sans Regular 13"
+}
