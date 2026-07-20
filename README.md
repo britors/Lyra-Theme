@@ -58,7 +58,10 @@ curl --proto '=https' --tlsv1.2 -fsSL \
 - `curl`, `tar`, `xz`, `sassc`, Node.js e ImageMagick 7 com suporte a JXL
 
 O instalador resolve esses pacotes automaticamente em Fedora, openSUSE, Arch e
-Debian/Ubuntu.
+Debian/Ubuntu. Testado no Fedora 44, cujos repositórios já trazem
+`ImageMagick` 7.1.2+ com suporte nativo a JXL e `sassc` na versão 3.6.2 — não é
+necessário nenhum repositório adicional (RPM Fusion, COPR etc.) para instalar
+as dependências.
 
 ## Build a partir do repositório
 
@@ -143,7 +146,7 @@ configuração na desinstalação se ela ainda apontar para o tema Lyra.
 ### Fedora / RPM
 
 O Fedora recebe um único pacote com temas, ícones e wallpapers. A especificação
-está em `packaging/lyra-enterprise-fedora.spec`.
+está em `packaging/lyra-enterprise-fedora.spec`. Testado no Fedora 44.
 
 Para instalar o RPM pré-compilado incluído no repositório:
 
