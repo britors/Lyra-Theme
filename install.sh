@@ -6,16 +6,18 @@ ref=${LYRA_REF:-main}
 variant=dark
 activate=1
 uninstall=0
+grub=1
 
 usage() {
   cat <<'EOF'
 Lyra Enterprise installer
 
-Usage: install.sh [--dark|--light] [--no-activate] [--uninstall]
+Usage: install.sh [--dark|--light] [--no-activate] [--no-grub] [--uninstall]
 
   --dark          Use dark Adwaita with Lyra Enterprise icons (default)
   --light         Use light Adwaita with Lyra Enterprise icons
   --no-activate   Install files without changing GNOME or GRUB settings
+  --no-grub       Skip installing and activating the GRUB theme entirely
   --uninstall     Remove both themes and restore GNOME defaults
 EOF
 }
@@ -25,6 +27,7 @@ while (($#)); do
     --dark) variant=dark ;;
     --light) variant=light ;;
     --no-activate) activate=0 ;;
+    --no-grub) grub=0 ;;
     --uninstall) uninstall=1 ;;
     -h|--help) usage; exit 0 ;;
     *) printf 'Unknown option: %s\n' "$1" >&2; usage >&2; exit 2 ;;
@@ -139,8 +142,7 @@ say 'Building themes, icons, wallpapers and GRUB theme'
 
 say 'Installing system files'
 sudo install -d /usr/share/themes /usr/share/icons \
-  /usr/share/backgrounds/lyra /usr/share/gnome-background-properties \
-  /usr/share/grub/themes
+  /usr/share/backgrounds/lyra /usr/share/gnome-background-properties
 sudo cp -a "$source_dir/dist/Lyra-Enterprise" \
   "$source_dir/dist/Lyra-Enterprise-Light" /usr/share/themes/
 sudo cp -a "$source_dir/dist/Lyra-Enterprise-Icons" /usr/share/icons/
@@ -149,7 +151,10 @@ sudo install -m 0644 "$source_dir"/dist/backgrounds/*.{png,jxl} \
 sudo install -m 0644 \
   "$source_dir/dist/gnome-background-properties/lyra-enterprise.xml" \
   /usr/share/gnome-background-properties/
-sudo cp -a "$source_dir/dist/grub/Lyra-Enterprise" /usr/share/grub/themes/
+if ((grub)); then
+  sudo install -d /usr/share/grub/themes
+  sudo cp -a "$source_dir/dist/grub/Lyra-Enterprise" /usr/share/grub/themes/
+fi
 command -v gtk-update-icon-cache >/dev/null 2>&1 && \
   sudo gtk-update-icon-cache -f /usr/share/icons/Lyra-Enterprise-Icons >/dev/null || true
 
@@ -174,7 +179,7 @@ if ((activate)) && command -v gsettings >/dev/null 2>&1; then
   fi
 fi
 
-if ((activate)); then
+if ((activate)) && ((grub)); then
   if [[ -f /etc/default/grub ]]; then
     say 'Activating Lyra Enterprise for GRUB'
     if ! sudo grep -qx 'GRUB_THEME="/usr/share/grub/themes/Lyra-Enterprise/theme.txt"' /etc/default/grub; then

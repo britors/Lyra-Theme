@@ -40,6 +40,7 @@ senha administrativa é solicitada diretamente pelo terminal.
 --dark          usa Adwaita escuro com ícones e wallpaper Lyra (padrão)
 --light         usa Adwaita claro com ícones e wallpaper Lyra
 --no-activate   instala sem modificar preferências do GNOME ou do GRUB
+--no-grub       não instala nem ativa o tema do GRUB
 --uninstall     remove os arquivos e restaura as preferências
 --help          mostra a ajuda
 ```
@@ -72,6 +73,18 @@ cd Lyra-Theme
 Os resultados são gravados em `dist/`. O último comando também gera
 `Lyra-Enterprise.tar.xz`. O build executa automaticamente a validação WCAG das
 paletas dark e light.
+
+Para compilar e instalar diretamente a partir deste checkout (sem baixar um
+tarball do GitHub), use:
+
+```bash
+./scripts/install-local.sh
+```
+
+Aceita as mesmas opções do `install.sh` (`--dark`, `--light`,
+`--no-activate`, `--no-grub`, `--uninstall`), mas não instala dependências de
+build automaticamente — instale `sassc`, Node.js e ImageMagick antes de
+executá-lo.
 
 ## Instalação manual
 

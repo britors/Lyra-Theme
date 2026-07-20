@@ -110,8 +110,7 @@ say 'Building themes, icons, wallpapers and GRUB theme'
 
 say 'Installing system files'
 sudo install -d /usr/share/themes /usr/share/icons \
-  /usr/share/backgrounds/lyra /usr/share/gnome-background-properties \
-  /usr/share/grub/themes
+  /usr/share/backgrounds/lyra /usr/share/gnome-background-properties
 sudo cp -a "$root/dist/Lyra-Enterprise" \
   "$root/dist/Lyra-Enterprise-Light" /usr/share/themes/
 sudo cp -a "$root/dist/Lyra-Enterprise-Icons" /usr/share/icons/
@@ -120,7 +119,10 @@ sudo install -m 0644 "$root"/dist/backgrounds/*.{png,jxl} \
 sudo install -m 0644 \
   "$root/dist/gnome-background-properties/lyra-enterprise.xml" \
   /usr/share/gnome-background-properties/
-sudo cp -a "$root/dist/grub/Lyra-Enterprise" /usr/share/grub/themes/
+if ((grub)); then
+  sudo install -d /usr/share/grub/themes
+  sudo cp -a "$root/dist/grub/Lyra-Enterprise" /usr/share/grub/themes/
+fi
 command -v gtk-update-icon-cache >/dev/null 2>&1 && \
   sudo gtk-update-icon-cache -f /usr/share/icons/Lyra-Enterprise-Icons >/dev/null || true
 
@@ -145,7 +147,7 @@ if ((activate)) && command -v gsettings >/dev/null 2>&1; then
   fi
 fi
 
-if ((activate)); then
+if ((activate)) && ((grub)); then
   if [[ -f /etc/default/grub ]]; then
     say 'Activating Lyra Enterprise for GRUB'
     if ! sudo grep -qx 'GRUB_THEME="/usr/share/grub/themes/Lyra-Enterprise/theme.txt"' /etc/default/grub; then
