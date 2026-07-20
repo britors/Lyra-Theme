@@ -10,7 +10,7 @@ compile_scss() {
   local tokens=$1 source=$2 output=$3
   if command -v sassc >/dev/null 2>&1; then
     { sed '/^\/\//d' "$tokens"; cat "$source"; } > "$tmp/input.scss"
-    sassc --style expanded --sourcemap=none "$tmp/input.scss" "$output"
+    sassc --style expanded "$tmp/input.scss" "$output"
     return
   fi
 

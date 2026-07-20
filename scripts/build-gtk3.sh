@@ -10,7 +10,7 @@ compile() {
   local tokens=$1 output=$2 input="$tmp/input.scss"
   { cat "$tokens"; cat "$root/src/gtk3/gtk.scss"; } > "$input"
   if command -v sassc >/dev/null 2>&1; then
-    sassc --style expanded --sourcemap=none "$input" "$output"
+    sassc --style expanded "$input" "$output"
   else
     cp "$root/src/gtk3/gtk.scss" "$output"
     while IFS= read -r line; do

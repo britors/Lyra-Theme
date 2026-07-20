@@ -2,7 +2,6 @@
 title-text: ""
 desktop-image: "background.png"
 desktop-color: "#0b1018"
-terminal-box: "0,0,0,0"
 terminal-border: "0"
 
 + boot_menu {
