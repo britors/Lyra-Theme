@@ -12,8 +12,19 @@
     <path d="M0 0h1210L790 420H0z"/>
     <path d="M3840 2160H2580l430-430h830z"/>
   </g>
-  <g transform="translate(3390 1755)" fill="none" stroke="@ENT_TEXT@" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" opacity="0.07">
-    <path d="M80 30v300c0 57 47 104 104 104s104-47 104-104V30"/>
-    <path d="M80 92h208M80 172h208M80 252h208M184 434v75M112 509h144"/>
+  <g transform="translate(3300 1650) scale(2)" opacity="@ENT_WATERMARK_OPACITY@">
+    <defs>
+      <linearGradient id="lyraMark" gradientUnits="userSpaceOnUse" x1="60" y1="0" x2="210" y2="200">
+        <stop offset="0%" stop-color="@ENT_BRAND_START@"/>
+        <stop offset="100%" stop-color="@ENT_BRAND_END@"/>
+      </linearGradient>
+    </defs>
+    <path fill="url(#lyraMark)" d="M104 190A140 140 0 0 0 199 56 96 96 0 0 1 104 190Z"/>
+    <path fill="none" stroke="url(#lyraMark)" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"
+          d="M150 14C118 14 96 34 92 62L92 150C92 166 86 176 76 180 68 183 62 180 60 174"/>
+    <g stroke="url(#lyraMark)" stroke-width="4" stroke-linecap="round">
+      <path d="M116 46v70M130 46v70M144 46v70M158 46v70"/>
+    </g>
+    <path fill="url(#lyraMark)" d="M196 18l4 14 14 4-14 4-4 14-4-14-14-4 14-4Z"/>
   </g>
 </svg>

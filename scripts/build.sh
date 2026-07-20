@@ -36,13 +36,18 @@ token_value() {
 
 render_wallpaper() {
   local tokens=$1 stem=$2
-  local bg surface border text
+  local bg surface border text brand_start brand_end watermark_opacity
   bg=$(token_value "$tokens" ent-bg)
   surface=$(token_value "$tokens" ent-surface)
   border=$(token_value "$tokens" ent-border)
   text=$(token_value "$tokens" ent-text)
+  brand_start=$(token_value "$tokens" ent-brand-start)
+  brand_end=$(token_value "$tokens" ent-brand-end)
+  watermark_opacity=$(token_value "$tokens" ent-watermark-opacity)
   sed -e "s/@ENT_BG@/$bg/g" -e "s/@ENT_SURFACE@/$surface/g" \
       -e "s/@ENT_BORDER@/$border/g" -e "s/@ENT_TEXT@/$text/g" \
+      -e "s/@ENT_BRAND_START@/$brand_start/g" -e "s/@ENT_BRAND_END@/$brand_end/g" \
+      -e "s/@ENT_WATERMARK_OPACITY@/$watermark_opacity/g" \
       "$root/src/wallpaper/enterprise.svg" > "$dist/backgrounds/$stem.svg"
   magick -background none "$dist/backgrounds/$stem.svg" -resize 3840x2160! \
     -strip -define png:color-type=2 "$dist/backgrounds/$stem.png"
