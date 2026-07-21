@@ -82,13 +82,21 @@ if ((uninstall)); then
     /usr/share/backgrounds/lyra/enterprise-light.png \
     /usr/share/backgrounds/lyra/enterprise.jxl \
     /usr/share/backgrounds/lyra/enterprise-light.jxl \
-    /usr/share/gnome-background-properties/lyra-enterprise.xml
+    /usr/share/gnome-background-properties/lyra-enterprise.xml \
+    /usr/share/color-schemes/Lyra-Enterprise.colors \
+    /usr/share/color-schemes/Lyra-Enterprise-Light.colors \
+    /usr/share/konsole/Lyra-Enterprise.colorscheme \
+    /usr/share/konsole/Lyra-Enterprise-Light.colorscheme
   if ((activate)) && command -v gsettings >/dev/null 2>&1; then
     [[ $(readlink "$HOME/.config/gtk-4.0/gtk.css" 2>/dev/null || true) == /usr/share/themes/Lyra-Enterprise* ]] && rm -f "$HOME/.config/gtk-4.0/gtk.css"
     gsettings reset org.gnome.shell.extensions.user-theme name 2>/dev/null || true
     gsettings reset org.gnome.desktop.interface gtk-theme 2>/dev/null || true
     gsettings reset org.gnome.desktop.interface icon-theme 2>/dev/null || true
     gsettings reset org.gnome.desktop.interface color-scheme 2>/dev/null || true
+  fi
+  if ((activate)) && command -v plasma-apply-colorscheme >/dev/null 2>&1 && \
+      [[ ${XDG_CURRENT_DESKTOP:-} == *KDE* ]]; then
+    plasma-apply-colorscheme BreezeDark >/dev/null 2>&1 || true
   fi
   if ((activate)) && [[ -f /etc/default/grub ]] && \
       sudo grep -qx 'GRUB_THEME="/usr/share/grub/themes/Lyra-Enterprise/theme.txt"' /etc/default/grub; then
@@ -142,7 +150,8 @@ say 'Building themes, icons, wallpapers and GRUB theme'
 
 say 'Installing system files'
 sudo install -d /usr/share/themes /usr/share/icons \
-  /usr/share/backgrounds/lyra /usr/share/gnome-background-properties
+  /usr/share/backgrounds/lyra /usr/share/gnome-background-properties \
+  /usr/share/color-schemes /usr/share/konsole
 sudo cp -a "$source_dir/dist/Lyra-Enterprise" \
   "$source_dir/dist/Lyra-Enterprise-Light" /usr/share/themes/
 sudo cp -a "$source_dir/dist/Lyra-Enterprise-Icons" /usr/share/icons/
@@ -151,6 +160,10 @@ sudo install -m 0644 "$source_dir"/dist/backgrounds/*.{png,jxl} \
 sudo install -m 0644 \
   "$source_dir/dist/gnome-background-properties/lyra-enterprise.xml" \
   /usr/share/gnome-background-properties/
+sudo install -m 0644 "$source_dir"/dist/kde/color-schemes/*.colors \
+  /usr/share/color-schemes/
+sudo install -m 0644 "$source_dir"/dist/kde/konsole/*.colorscheme \
+  /usr/share/konsole/
 if ((grub)); then
   sudo install -d /usr/share/grub/themes
   sudo cp -a "$source_dir/dist/grub/Lyra-Enterprise" /usr/share/grub/themes/
@@ -176,6 +189,16 @@ if ((activate)) && command -v gsettings >/dev/null 2>&1; then
     'file:///usr/share/backgrounds/lyra/enterprise.png'
   if [[ $(readlink "$HOME/.config/gtk-4.0/gtk.css" 2>/dev/null || true) == /usr/share/themes/Lyra-Enterprise* ]]; then
     rm -f "$HOME/.config/gtk-4.0/gtk.css"
+  fi
+fi
+
+if ((activate)) && command -v plasma-apply-colorscheme >/dev/null 2>&1 && \
+    [[ ${XDG_CURRENT_DESKTOP:-} == *KDE* ]]; then
+  say 'Activating Lyra Enterprise Plasma color scheme'
+  if [[ $variant == light ]]; then
+    plasma-apply-colorscheme Lyra-Enterprise-Light
+  else
+    plasma-apply-colorscheme Lyra-Enterprise
   fi
 fi
 

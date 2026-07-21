@@ -10,6 +10,8 @@ Adwaita no Shell e nos aplicativos, com ícones e wallpapers Lyra Enterprise.
 - Tema vetorial `Lyra-Enterprise-Icons`, com fallback completo para Adwaita
 - Wallpapers dark e light em PNG e JPEG XL, 3840×2160
 - Tema do GRUB 2 com fundo Full HD e menu de boot Lyra Enterprise
+- Esquemas de cores dark e light para KDE Plasma, com esquemas correspondentes
+  para o Konsole
 - Pacotes RPM para openSUSE e `PKGBUILD` para Arch/Lyra OS
 
 ## Instalação rápida
@@ -94,13 +96,15 @@ executá-lo.
 ```bash
 sudo install -d /usr/share/themes /usr/share/icons \
   /usr/share/backgrounds/lyra /usr/share/gnome-background-properties \
-  /usr/share/grub/themes
+  /usr/share/grub/themes /usr/share/color-schemes /usr/share/konsole
 sudo cp -a dist/Lyra-Enterprise dist/Lyra-Enterprise-Light /usr/share/themes/
 sudo cp -a dist/Lyra-Enterprise-Icons /usr/share/icons/
 sudo install -m 0644 dist/backgrounds/*.{png,jxl} /usr/share/backgrounds/lyra/
 sudo install -m 0644 dist/gnome-background-properties/lyra-enterprise.xml \
   /usr/share/gnome-background-properties/
 sudo cp -a dist/grub/Lyra-Enterprise /usr/share/grub/themes/
+sudo install -m 0644 dist/kde/color-schemes/*.colors /usr/share/color-schemes/
+sudo install -m 0644 dist/kde/konsole/*.colorscheme /usr/share/konsole/
 ```
 
 ## Ativação manual
@@ -141,6 +145,26 @@ Depois execute `sudo update-grub` (Debian/Ubuntu), ou
 `sudo grub-mkconfig -o /boot/grub/grub.cfg` (Arch). O instalador só remove essa
 configuração na desinstalação se ela ainda apontar para o tema Lyra.
 
+### KDE Plasma
+
+O instalador sempre grava os esquemas de cores do Plasma e do Konsole em
+`/usr/share/color-schemes` e `/usr/share/konsole`. Numa sessão Plasma
+(`XDG_CURRENT_DESKTOP` contendo `KDE`) com `plasma-apply-colorscheme`
+disponível, a ativação automática aplica o esquema Lyra Enterprise (dark ou
+light, conforme `--dark`/`--light`); em outras sessões, ative manualmente:
+
+```bash
+plasma-apply-colorscheme Lyra-Enterprise        # escuro
+plasma-apply-colorscheme Lyra-Enterprise-Light  # claro
+```
+
+Ou pelo System Settings: **Aparência > Cores**, selecione **Lyra Enterprise**
+ou **Lyra Enterprise Light**. O esquema de cores do Konsole (**Lyra
+Enterprise**/**Lyra Enterprise Light**) fica disponível em **Configurações do
+Konsole > Editar Perfil Atual > Aparência**. Os ícones Lyra Enterprise
+funcionam nativamente no Plasma por seguirem a especificação freedesktop de
+temas de ícones; selecione-os em **Aparência > Ícones**.
+
 ## Pacotes
 
 ### Fedora / RPM
@@ -164,7 +188,7 @@ sudo dnf install -y rpm-build rpmdevtools ImageMagick nodejs sassc \
 rpmdev-setuptree
 cp packaging/lyra-enterprise-fedora.spec ~/rpmbuild/SPECS/
 rpmbuild -bb ~/rpmbuild/SPECS/lyra-enterprise-fedora.spec
-sudo dnf install ~/rpmbuild/RPMS/noarch/lyra-enterprise-1.1.0-1*.noarch.rpm
+sudo dnf install ~/rpmbuild/RPMS/noarch/lyra-enterprise-1.2.0-1*.noarch.rpm
 ```
 
 ### openSUSE / RPM
@@ -195,6 +219,7 @@ src/gtk3/        port GTK 3 e atribuição LGPL
 src/icons/       tema de ícones SVG
 src/wallpaper/   fonte vetorial e metadados GNOME
 src/grub/        tema, fundo e seleção do menu GRUB
+src/kde/         templates do esquema de cores do Plasma e do Konsole
 scripts/         build, validação e empacotamento
 packaging/       PKGBUILD e especificações RPM
 ```

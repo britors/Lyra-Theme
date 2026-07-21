@@ -1,8 +1,8 @@
 # Maintainer: Lyra OS Team <contact@lyraos.dev>
 pkgname=lyra-enterprise-theme
-pkgver=1.1.0
+pkgver=1.2.0
 pkgrel=1
-pkgdesc='Corporate GNOME Shell, GTK, wallpaper and GRUB theme for Lyra OS'
+pkgdesc='Corporate GNOME Shell, GTK, KDE Plasma, wallpaper and GRUB theme for Lyra OS'
 arch=('any')
 url='https://github.com/britors/lyra-enterprise-theme'
 license=('GPL-3.0-or-later' 'LGPL-2.1-or-later')
@@ -21,6 +21,7 @@ package() {
   install -d "$pkgdir/usr/share/themes" "$pkgdir/usr/share/backgrounds/lyra" \
     "$pkgdir/usr/share/gnome-background-properties" "$pkgdir/usr/share/licenses/$pkgname"
   install -d "$pkgdir/usr/share/grub/themes"
+  install -d "$pkgdir/usr/share/color-schemes" "$pkgdir/usr/share/konsole"
   cp -a dist/Lyra-Enterprise dist/Lyra-Enterprise-Light "$pkgdir/usr/share/themes/"
   install -m644 dist/backgrounds/*.{png,jxl} "$pkgdir/usr/share/backgrounds/lyra/"
   install -m644 dist/gnome-background-properties/lyra-enterprise.xml \
@@ -29,4 +30,6 @@ package() {
   install -m644 src/gtk3/COPYING.LGPL "$pkgdir/usr/share/licenses/$pkgname/COPYING.LGPL"
   install -m644 src/gtk3/ATTRIBUTION.md "$pkgdir/usr/share/licenses/$pkgname/GTK3-ATTRIBUTION.md"
   cp -a dist/grub/Lyra-Enterprise "$pkgdir/usr/share/grub/themes/"
+  install -m644 dist/kde/color-schemes/*.colors "$pkgdir/usr/share/color-schemes/"
+  install -m644 dist/kde/konsole/*.colorscheme "$pkgdir/usr/share/konsole/"
 }

@@ -1,7 +1,7 @@
 Name:           lyra-enterprise
-Version:        1.1.0
+Version:        1.2.0
 Release:        1%{?dist}
-Summary:        Corporate GNOME and GRUB theme, icons and wallpapers for Lyra OS
+Summary:        Corporate GNOME, KDE and GRUB theme, icons and wallpapers for Lyra OS
 License:        GPL-3.0-or-later AND LGPL-2.1-or-later
 URL:            https://github.com/britors/Lyra-Theme
 Source0:        %{url}/archive/v%{version}/Lyra-Theme-%{version}.tar.gz
@@ -16,7 +16,8 @@ Requires:       adwaita-icon-theme
 Lyra Enterprise is a flat corporate theme for GNOME 48 and newer. This package
 contains dark and light GNOME Shell, GTK 4 and GTK 3 themes, a scalable icon
 theme inheriting Adwaita, and matching 4K wallpapers in PNG and JPEG XL.
-It also provides a matching GRUB 2 boot menu theme.
+It also provides a matching GRUB 2 boot menu theme, and dark and light Plasma
+color schemes with matching Konsole color schemes for KDE Plasma.
 
 %prep
 %autosetup -n Lyra-Theme-%{version}
@@ -44,6 +45,12 @@ install -m 0644 dist/gnome-background-properties/lyra-enterprise.xml \
 install -d %{buildroot}%{_datadir}/grub/themes
 cp -a dist/grub/Lyra-Enterprise %{buildroot}%{_datadir}/grub/themes/
 
+install -d %{buildroot}%{_datadir}/color-schemes %{buildroot}%{_datadir}/konsole
+install -m 0644 dist/kde/color-schemes/*.colors \
+  %{buildroot}%{_datadir}/color-schemes/
+install -m 0644 dist/kde/konsole/*.colorscheme \
+  %{buildroot}%{_datadir}/konsole/
+
 %files
 %license LICENSE src/gtk3/COPYING.LGPL
 %doc README.md src/gtk3/ATTRIBUTION.md
@@ -56,8 +63,15 @@ cp -a dist/grub/Lyra-Enterprise %{buildroot}%{_datadir}/grub/themes/
 %{_datadir}/backgrounds/lyra/enterprise-light.jxl
 %{_datadir}/gnome-background-properties/lyra-enterprise.xml
 %{_datadir}/grub/themes/Lyra-Enterprise/
+%{_datadir}/color-schemes/Lyra-Enterprise.colors
+%{_datadir}/color-schemes/Lyra-Enterprise-Light.colors
+%{_datadir}/konsole/Lyra-Enterprise.colorscheme
+%{_datadir}/konsole/Lyra-Enterprise-Light.colorscheme
 
 %changelog
+* Tue Jul 21 2026 Lyra OS Team <contact@lyraos.dev> - 1.2.0-1
+- Add Plasma color schemes and matching Konsole color schemes for KDE
+
 * Sun Jul 19 2026 Lyra OS Team <contact@lyraos.dev> - 1.1.0-1
 - Keep Adwaita active by default and apply Lyra icons and wallpapers
 - Add the Lyra Enterprise GRUB theme

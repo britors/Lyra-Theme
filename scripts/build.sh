@@ -69,6 +69,7 @@ compile_scss "$root/src/shell/_tokens-light.scss" "$root/src/shell/gnome-shell.s
 cp "$root/src/gtk4/gtk-dark.css" "$dist/Lyra-Enterprise/gtk-4.0/gtk.css"
 cp "$root/src/gtk4/gtk-light.css" "$dist/Lyra-Enterprise-Light/gtk-4.0/gtk.css"
 "$root/scripts/build-gtk3.sh" "$dist"
+"$root/scripts/build-kde.sh" "$dist"
 
 command -v magick >/dev/null 2>&1 || { echo 'error: ImageMagick is required' >&2; exit 1; }
 render_wallpaper "$root/src/shell/_tokens-dark.scss" enterprise

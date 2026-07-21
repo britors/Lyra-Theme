@@ -1,7 +1,7 @@
 Name:           lyra-enterprise-theme
-Version:        1.1.0
+Version:        1.2.0
 Release:        1%{?dist}
-Summary:        Corporate GNOME and GRUB theme for Lyra OS
+Summary:        Corporate GNOME, KDE and GRUB theme for Lyra OS
 License:        GPL-3.0-or-later AND LGPL-2.1-or-later
 URL:            https://github.com/britors/lyra-enterprise-theme
 Source0:        %{name}-%{version}.tar.xz
@@ -13,7 +13,8 @@ BuildRequires:  sassc
 %description
 Corporate, flat GNOME 48+ theme with dark and light variants for GNOME Shell,
 GTK 4/libadwaita and GTK 3. Includes matching PNG and JPEG XL wallpapers.
-Also includes the Lyra Enterprise boot menu theme for GRUB 2.
+Also includes the Lyra Enterprise boot menu theme for GRUB 2, and dark and
+light Plasma color schemes with matching Konsole color schemes for KDE.
 
 %prep
 %autosetup
@@ -36,6 +37,12 @@ install -m 0644 dist/gnome-background-properties/lyra-enterprise.xml \
 install -d %{buildroot}%{_datadir}/grub/themes
 cp -a dist/grub/Lyra-Enterprise %{buildroot}%{_datadir}/grub/themes/
 
+install -d %{buildroot}%{_datadir}/color-schemes %{buildroot}%{_datadir}/konsole
+install -m 0644 dist/kde/color-schemes/*.colors \
+  %{buildroot}%{_datadir}/color-schemes/
+install -m 0644 dist/kde/konsole/*.colorscheme \
+  %{buildroot}%{_datadir}/konsole/
+
 %files
 %license LICENSE src/gtk3/COPYING.LGPL
 %doc README.md src/gtk3/ATTRIBUTION.md
@@ -47,8 +54,15 @@ cp -a dist/grub/Lyra-Enterprise %{buildroot}%{_datadir}/grub/themes/
 %{_datadir}/backgrounds/lyra/enterprise-light.jxl
 %{_datadir}/gnome-background-properties/lyra-enterprise.xml
 %{_datadir}/grub/themes/Lyra-Enterprise/
+%{_datadir}/color-schemes/Lyra-Enterprise.colors
+%{_datadir}/color-schemes/Lyra-Enterprise-Light.colors
+%{_datadir}/konsole/Lyra-Enterprise.colorscheme
+%{_datadir}/konsole/Lyra-Enterprise-Light.colorscheme
 
 %changelog
+* Tue Jul 21 2026 Lyra OS Team <contact@lyraos.dev> - 1.2.0-1
+- Add Plasma color schemes and matching Konsole color schemes for KDE
+
 * Sun Jul 19 2026 Lyra OS Team <contact@lyraos.dev> - 1.1.0-1
 - Keep Adwaita active by default and add the GRUB theme
 
