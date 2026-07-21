@@ -1,7 +1,7 @@
 Name:           lyra-enterprise-theme
-Version:        1.2.0
+Version:        1.3.0
 Release:        1%{?dist}
-Summary:        Corporate GNOME, KDE and GRUB theme for Lyra OS
+Summary:        Corporate GNOME, KDE, XFCE and GRUB theme for Lyra OS
 License:        GPL-3.0-or-later AND LGPL-2.1-or-later
 URL:            https://github.com/britors/lyra-enterprise-theme
 Source0:        %{name}-%{version}.tar.xz
@@ -13,8 +13,10 @@ BuildRequires:  sassc
 %description
 Corporate, flat GNOME 48+ theme with dark and light variants for GNOME Shell,
 GTK 4/libadwaita and GTK 3. Includes matching PNG and JPEG XL wallpapers.
-Also includes the Lyra Enterprise boot menu theme for GRUB 2, and dark and
-light Plasma color schemes with matching Konsole color schemes for KDE.
+Also includes the Lyra Enterprise boot menu theme for GRUB 2, dark and
+light Plasma color schemes with matching Konsole color schemes for KDE, and
+an xfwm4 window manager theme with a matching xfce4-terminal color scheme
+for XFCE.
 
 %prep
 %autosetup
@@ -43,6 +45,10 @@ install -m 0644 dist/kde/color-schemes/*.colors \
 install -m 0644 dist/kde/konsole/*.colorscheme \
   %{buildroot}%{_datadir}/konsole/
 
+install -d %{buildroot}%{_datadir}/xfce4/terminal/colorschemes
+install -m 0644 dist/xfce4-terminal/colorschemes/*.theme \
+  %{buildroot}%{_datadir}/xfce4/terminal/colorschemes/
+
 %files
 %license LICENSE src/gtk3/COPYING.LGPL
 %doc README.md src/gtk3/ATTRIBUTION.md
@@ -58,8 +64,13 @@ install -m 0644 dist/kde/konsole/*.colorscheme \
 %{_datadir}/color-schemes/Lyra-Enterprise-Light.colors
 %{_datadir}/konsole/Lyra-Enterprise.colorscheme
 %{_datadir}/konsole/Lyra-Enterprise-Light.colorscheme
+%{_datadir}/xfce4/terminal/colorschemes/Lyra-Enterprise.theme
+%{_datadir}/xfce4/terminal/colorschemes/Lyra-Enterprise-Light.theme
 
 %changelog
+* Tue Jul 21 2026 Lyra OS Team <contact@lyraos.dev> - 1.3.0-1
+- Add xfwm4 window theme and xfce4-terminal color scheme for XFCE
+
 * Tue Jul 21 2026 Lyra OS Team <contact@lyraos.dev> - 1.2.0-1
 - Add Plasma color schemes and matching Konsole color schemes for KDE
 

@@ -86,7 +86,9 @@ if ((uninstall)); then
     /usr/share/color-schemes/Lyra-Enterprise.colors \
     /usr/share/color-schemes/Lyra-Enterprise-Light.colors \
     /usr/share/konsole/Lyra-Enterprise.colorscheme \
-    /usr/share/konsole/Lyra-Enterprise-Light.colorscheme
+    /usr/share/konsole/Lyra-Enterprise-Light.colorscheme \
+    /usr/share/xfce4/terminal/colorschemes/Lyra-Enterprise.theme \
+    /usr/share/xfce4/terminal/colorschemes/Lyra-Enterprise-Light.theme
   if ((activate)) && command -v gsettings >/dev/null 2>&1 && \
       [[ ${XDG_CURRENT_DESKTOP:-} == *GNOME* ]]; then
     [[ $(readlink "$HOME/.config/gtk-4.0/gtk.css" 2>/dev/null || true) == /usr/share/themes/Lyra-Enterprise* ]] && rm -f "$HOME/.config/gtk-4.0/gtk.css"
@@ -100,6 +102,12 @@ if ((uninstall)); then
       plasma-apply-colorscheme BreezeDark >/dev/null 2>&1 || true
     command -v plasma-apply-icontheme >/dev/null 2>&1 && \
       plasma-apply-icontheme breeze >/dev/null 2>&1 || true
+  fi
+  if ((activate)) && [[ ${XDG_CURRENT_DESKTOP:-} == *XFCE* ]] && \
+      command -v xfconf-query >/dev/null 2>&1; then
+    xfconf-query -c xsettings -p /Net/ThemeName -s Default 2>/dev/null || true
+    xfconf-query -c xsettings -p /Net/IconThemeName -s Adwaita 2>/dev/null || true
+    xfconf-query -c xfwm4 -p /general/theme -s Default 2>/dev/null || true
   fi
   if ((activate)) && [[ -f /etc/default/grub ]] && \
       sudo grep -qx 'GRUB_THEME="/usr/share/grub/themes/Lyra-Enterprise/theme.txt"' /etc/default/grub; then
@@ -154,7 +162,8 @@ say 'Building themes, icons, wallpapers and GRUB theme'
 say 'Installing system files'
 sudo install -d /usr/share/themes /usr/share/icons \
   /usr/share/backgrounds/lyra /usr/share/gnome-background-properties \
-  /usr/share/color-schemes /usr/share/konsole
+  /usr/share/color-schemes /usr/share/konsole \
+  /usr/share/xfce4/terminal/colorschemes
 sudo cp -a "$source_dir/dist/Lyra-Enterprise" \
   "$source_dir/dist/Lyra-Enterprise-Light" /usr/share/themes/
 sudo cp -a "$source_dir/dist/Lyra-Enterprise-Icons" /usr/share/icons/
@@ -167,6 +176,8 @@ sudo install -m 0644 "$source_dir"/dist/kde/color-schemes/*.colors \
   /usr/share/color-schemes/
 sudo install -m 0644 "$source_dir"/dist/kde/konsole/*.colorscheme \
   /usr/share/konsole/
+sudo install -m 0644 "$source_dir"/dist/xfce4-terminal/colorschemes/*.theme \
+  /usr/share/xfce4/terminal/colorschemes/
 if ((grub)); then
   sudo install -d /usr/share/grub/themes
   sudo cp -a "$source_dir/dist/grub/Lyra-Enterprise" /usr/share/grub/themes/
@@ -207,6 +218,16 @@ if ((activate)) && [[ ${XDG_CURRENT_DESKTOP:-} == *KDE* ]]; then
   fi
   command -v plasma-apply-icontheme >/dev/null 2>&1 && \
     plasma-apply-icontheme Lyra-Enterprise-Icons >/dev/null 2>&1 || true
+fi
+
+if ((activate)) && [[ ${XDG_CURRENT_DESKTOP:-} == *XFCE* ]] && \
+    command -v xfconf-query >/dev/null 2>&1; then
+  say 'Activating Lyra Enterprise style, icons and window theme for XFCE'
+  theme=Lyra-Enterprise
+  [[ $variant == light ]] && theme=Lyra-Enterprise-Light
+  xfconf-query -c xsettings -p /Net/ThemeName -s "$theme"
+  xfconf-query -c xsettings -p /Net/IconThemeName -s Lyra-Enterprise-Icons
+  xfconf-query -c xfwm4 -p /general/theme -s "$theme"
 fi
 
 if ((activate)) && ((grub)); then

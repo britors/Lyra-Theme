@@ -12,6 +12,7 @@ Adwaita no Shell e nos aplicativos, com ícones e wallpapers Lyra Enterprise.
 - Tema do GRUB 2 com fundo Full HD e menu de boot Lyra Enterprise
 - Esquemas de cores dark e light para KDE Plasma, com esquemas correspondentes
   para o Konsole
+- Tema do xfwm4 e esquema de cores do xfce4-terminal para XFCE
 - Pacotes RPM para openSUSE e `PKGBUILD` para Arch/Lyra OS
 
 ## Instalação rápida
@@ -33,9 +34,11 @@ curl --proto '=https' --tlsv1.2 -fsSL \
 
 O instalador detecta o gerenciador de pacotes, instala as dependências, compila
 os arquivos, instala tema, ícones, wallpapers e GRUB, detecta a sessão desktop
-ativa (GNOME ou KDE Plasma, via `XDG_CURRENT_DESKTOP`) e ativa o tema de
-ícones correspondente, além do menu de boot. A senha administrativa é
-solicitada diretamente pelo terminal.
+ativa (GNOME, KDE Plasma ou XFCE, via `XDG_CURRENT_DESKTOP`) e ativa o tema de
+ícones correspondente, além do menu de boot. Em XFCE, o instalador também
+aplica o estilo GTK e o tema de janelas (xfwm4) Lyra Enterprise, já que o
+XFCE não tem o mesmo compromisso de compatibilidade com o Adwaita que o
+GNOME. A senha administrativa é solicitada diretamente pelo terminal.
 
 ### Opções
 
@@ -97,7 +100,8 @@ executá-lo.
 ```bash
 sudo install -d /usr/share/themes /usr/share/icons \
   /usr/share/backgrounds/lyra /usr/share/gnome-background-properties \
-  /usr/share/grub/themes /usr/share/color-schemes /usr/share/konsole
+  /usr/share/grub/themes /usr/share/color-schemes /usr/share/konsole \
+  /usr/share/xfce4/terminal/colorschemes
 sudo cp -a dist/Lyra-Enterprise dist/Lyra-Enterprise-Light /usr/share/themes/
 sudo cp -a dist/Lyra-Enterprise-Icons /usr/share/icons/
 sudo install -m 0644 dist/backgrounds/*.{png,jxl} /usr/share/backgrounds/lyra/
@@ -106,6 +110,8 @@ sudo install -m 0644 dist/gnome-background-properties/lyra-enterprise.xml \
 sudo cp -a dist/grub/Lyra-Enterprise /usr/share/grub/themes/
 sudo install -m 0644 dist/kde/color-schemes/*.colors /usr/share/color-schemes/
 sudo install -m 0644 dist/kde/konsole/*.colorscheme /usr/share/konsole/
+sudo install -m 0644 dist/xfce4-terminal/colorschemes/*.theme \
+  /usr/share/xfce4/terminal/colorschemes/
 ```
 
 ## Ativação manual
@@ -168,6 +174,33 @@ Enterprise Icons**. O esquema de cores do Konsole (**Lyra
 Enterprise**/**Lyra Enterprise Light**) fica disponível em **Configurações do
 Konsole > Editar Perfil Atual > Aparência**.
 
+### XFCE
+
+O instalador sempre grava o tema do xfwm4 (dentro de `Lyra-Enterprise` e
+`Lyra-Enterprise-Light`, em `/usr/share/themes`) e o esquema de cores do
+xfce4-terminal em `/usr/share/xfce4/terminal/colorschemes`. Numa sessão XFCE
+(`XDG_CURRENT_DESKTOP` contendo `XFCE`), a ativação automática aplica o
+estilo GTK, o tema de ícones e o tema de janelas Lyra Enterprise (dark ou
+light, conforme `--dark`/`--light`) via `xfconf-query`, quando esse comando
+está disponível; em outras sessões, ative manualmente:
+
+```bash
+xfconf-query -c xsettings -p /Net/ThemeName -s Lyra-Enterprise        # estilo GTK
+xfconf-query -c xsettings -p /Net/IconThemeName -s Lyra-Enterprise-Icons
+xfconf-query -c xfwm4 -p /general/theme -s Lyra-Enterprise            # janelas
+```
+
+Use `Lyra-Enterprise-Light` para a variante clara. Ou pelo Configurações do
+Aparência do XFCE: aba **Estilo**, selecione **Lyra-Enterprise**; aba
+**Ícones**, selecione **Lyra-Enterprise-Icons**; e no **Configurações do
+Gerenciador de Janelas**, aba **Estilo**, selecione **Lyra-Enterprise**.
+
+O wallpaper e o esquema de cores do terminal não são ativados
+automaticamente: defina o papel de parede em **Configurações do Desktop**
+apontando para `/usr/share/backgrounds/lyra/enterprise.png` (ou
+`enterprise-light.png`), e selecione o esquema de cores em
+**xfce4-terminal > Editar > Preferências > Cores > Predefinições**.
+
 ## Pacotes
 
 ### Fedora / RPM
@@ -191,7 +224,7 @@ sudo dnf install -y rpm-build rpmdevtools ImageMagick nodejs sassc \
 rpmdev-setuptree
 cp packaging/lyra-enterprise-fedora.spec ~/rpmbuild/SPECS/
 rpmbuild -bb ~/rpmbuild/SPECS/lyra-enterprise-fedora.spec
-sudo dnf install ~/rpmbuild/RPMS/noarch/lyra-enterprise-1.2.0-1*.noarch.rpm
+sudo dnf install ~/rpmbuild/RPMS/noarch/lyra-enterprise-1.3.0-1*.noarch.rpm
 ```
 
 ### openSUSE / RPM
@@ -223,6 +256,8 @@ src/icons/       tema de ícones SVG
 src/wallpaper/   fonte vetorial e metadados GNOME
 src/grub/        tema, fundo e seleção do menu GRUB
 src/kde/         templates do esquema de cores do Plasma e do Konsole
+src/xfwm4/       template do tema de janelas do XFCE
+src/xfce4-terminal/  template do esquema de cores do xfce4-terminal
 scripts/         build, validação e empacotamento
 packaging/       PKGBUILD e especificações RPM
 ```
