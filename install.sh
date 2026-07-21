@@ -87,16 +87,19 @@ if ((uninstall)); then
     /usr/share/color-schemes/Lyra-Enterprise-Light.colors \
     /usr/share/konsole/Lyra-Enterprise.colorscheme \
     /usr/share/konsole/Lyra-Enterprise-Light.colorscheme
-  if ((activate)) && command -v gsettings >/dev/null 2>&1; then
+  if ((activate)) && command -v gsettings >/dev/null 2>&1 && \
+      [[ ${XDG_CURRENT_DESKTOP:-} == *GNOME* ]]; then
     [[ $(readlink "$HOME/.config/gtk-4.0/gtk.css" 2>/dev/null || true) == /usr/share/themes/Lyra-Enterprise* ]] && rm -f "$HOME/.config/gtk-4.0/gtk.css"
     gsettings reset org.gnome.shell.extensions.user-theme name 2>/dev/null || true
     gsettings reset org.gnome.desktop.interface gtk-theme 2>/dev/null || true
     gsettings reset org.gnome.desktop.interface icon-theme 2>/dev/null || true
     gsettings reset org.gnome.desktop.interface color-scheme 2>/dev/null || true
   fi
-  if ((activate)) && command -v plasma-apply-colorscheme >/dev/null 2>&1 && \
-      [[ ${XDG_CURRENT_DESKTOP:-} == *KDE* ]]; then
-    plasma-apply-colorscheme BreezeDark >/dev/null 2>&1 || true
+  if ((activate)) && [[ ${XDG_CURRENT_DESKTOP:-} == *KDE* ]]; then
+    command -v plasma-apply-colorscheme >/dev/null 2>&1 && \
+      plasma-apply-colorscheme BreezeDark >/dev/null 2>&1 || true
+    command -v plasma-apply-icontheme >/dev/null 2>&1 && \
+      plasma-apply-icontheme breeze >/dev/null 2>&1 || true
   fi
   if ((activate)) && [[ -f /etc/default/grub ]] && \
       sudo grep -qx 'GRUB_THEME="/usr/share/grub/themes/Lyra-Enterprise/theme.txt"' /etc/default/grub; then
@@ -171,7 +174,8 @@ fi
 command -v gtk-update-icon-cache >/dev/null 2>&1 && \
   sudo gtk-update-icon-cache -f /usr/share/icons/Lyra-Enterprise-Icons >/dev/null || true
 
-if ((activate)) && command -v gsettings >/dev/null 2>&1; then
+if ((activate)) && command -v gsettings >/dev/null 2>&1 && \
+    [[ ${XDG_CURRENT_DESKTOP:-} == *GNOME* ]]; then
   if [[ $variant == light ]]; then
     scheme=prefer-light
   else
@@ -192,14 +196,17 @@ if ((activate)) && command -v gsettings >/dev/null 2>&1; then
   fi
 fi
 
-if ((activate)) && command -v plasma-apply-colorscheme >/dev/null 2>&1 && \
-    [[ ${XDG_CURRENT_DESKTOP:-} == *KDE* ]]; then
-  say 'Activating Lyra Enterprise Plasma color scheme'
-  if [[ $variant == light ]]; then
-    plasma-apply-colorscheme Lyra-Enterprise-Light
-  else
-    plasma-apply-colorscheme Lyra-Enterprise
+if ((activate)) && [[ ${XDG_CURRENT_DESKTOP:-} == *KDE* ]]; then
+  if command -v plasma-apply-colorscheme >/dev/null 2>&1; then
+    say 'Activating Lyra Enterprise Plasma color scheme and icons'
+    if [[ $variant == light ]]; then
+      plasma-apply-colorscheme Lyra-Enterprise-Light
+    else
+      plasma-apply-colorscheme Lyra-Enterprise
+    fi
   fi
+  command -v plasma-apply-icontheme >/dev/null 2>&1 && \
+    plasma-apply-icontheme Lyra-Enterprise-Icons >/dev/null 2>&1 || true
 fi
 
 if ((activate)) && ((grub)); then

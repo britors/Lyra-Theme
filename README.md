@@ -32,9 +32,10 @@ curl --proto '=https' --tlsv1.2 -fsSL \
 ```
 
 O instalador detecta o gerenciador de pacotes, instala as dependências, compila
-os arquivos, instala tema, ícones, wallpapers e GRUB e configura a sessão GNOME
-e o menu de boot. A
-senha administrativa é solicitada diretamente pelo terminal.
+os arquivos, instala tema, ícones, wallpapers e GRUB, detecta a sessão desktop
+ativa (GNOME ou KDE Plasma, via `XDG_CURRENT_DESKTOP`) e ativa o tema de
+ícones correspondente, além do menu de boot. A senha administrativa é
+solicitada diretamente pelo terminal.
 
 ### Opções
 
@@ -149,21 +150,23 @@ configuração na desinstalação se ela ainda apontar para o tema Lyra.
 
 O instalador sempre grava os esquemas de cores do Plasma e do Konsole em
 `/usr/share/color-schemes` e `/usr/share/konsole`. Numa sessão Plasma
-(`XDG_CURRENT_DESKTOP` contendo `KDE`) com `plasma-apply-colorscheme`
-disponível, a ativação automática aplica o esquema Lyra Enterprise (dark ou
-light, conforme `--dark`/`--light`); em outras sessões, ative manualmente:
+(`XDG_CURRENT_DESKTOP` contendo `KDE`), a ativação automática aplica o
+esquema de cores Lyra Enterprise (dark ou light, conforme `--dark`/`--light`)
+via `plasma-apply-colorscheme` e o tema de ícones **Lyra-Enterprise-Icons**
+via `plasma-apply-icontheme`, quando esses comandos estão disponíveis; em
+outras sessões, ative manualmente:
 
 ```bash
 plasma-apply-colorscheme Lyra-Enterprise        # escuro
 plasma-apply-colorscheme Lyra-Enterprise-Light  # claro
+plasma-apply-icontheme Lyra-Enterprise-Icons
 ```
 
 Ou pelo System Settings: **Aparência > Cores**, selecione **Lyra Enterprise**
-ou **Lyra Enterprise Light**. O esquema de cores do Konsole (**Lyra
+ou **Lyra Enterprise Light**; em **Aparência > Ícones**, selecione **Lyra
+Enterprise Icons**. O esquema de cores do Konsole (**Lyra
 Enterprise**/**Lyra Enterprise Light**) fica disponível em **Configurações do
-Konsole > Editar Perfil Atual > Aparência**. Os ícones Lyra Enterprise
-funcionam nativamente no Plasma por seguirem a especificação freedesktop de
-temas de ícones; selecione-os em **Aparência > Ícones**.
+Konsole > Editar Perfil Atual > Aparência**.
 
 ## Pacotes
 
