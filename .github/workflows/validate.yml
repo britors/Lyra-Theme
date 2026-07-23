@@ -3,9 +3,10 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
+    container: opensuse/tumbleweed:latest
     steps:
+      - run: zypper --non-interactive install tar xz git sassc ImageMagick nodejs
       - uses: actions/checkout@v4
-      - run: sudo apt-get update && sudo apt-get install -y sassc imagemagick
       - run: ./scripts/build.sh
       - run: ./scripts/package.sh
       - uses: actions/upload-artifact@v4

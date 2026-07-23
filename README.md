@@ -1,8 +1,8 @@
 # Lyra Enterprise
 
-Identidade visual para GNOME 48+, criada para o Lyra OS e compatível com Fedora,
-openSUSE, Arch Linux e distribuições derivadas. A configuração recomendada usa
-Adwaita no Shell e nos aplicativos, com ícones e wallpapers Lyra Enterprise.
+Identidade visual para GNOME 48+, criada para o Lyra OS e para openSUSE. A
+configuração recomendada usa Adwaita no Shell e nos aplicativos, com ícones e
+wallpapers Lyra Enterprise.
 
 ## Componentes
 
@@ -10,15 +10,14 @@ Adwaita no Shell e nos aplicativos, com ícones e wallpapers Lyra Enterprise.
 - Tema vetorial `Lyra-Enterprise-Icons`, com fallback completo para Adwaita
 - Wallpapers dark e light em PNG e JPEG XL, 3840×2160
 - Tema do GRUB 2 com fundo Full HD e menu de boot Lyra Enterprise
-- Esquemas de cores dark e light para KDE Plasma, com esquemas correspondentes
-  para o Konsole
-- Tema do xfwm4 e esquema de cores do xfce4-terminal para XFCE
-- Pacotes RPM para openSUSE e `PKGBUILD` para Arch/Lyra OS
+- Tema de boot do Plymouth com o mesmo fundo e logo do GRUB
+- Config do neofetch com logo ascii da Lyra e cores da marca
+- Pacotes RPM para openSUSE
 
 ## Instalação rápida
 
-Revise o [install.sh](install.sh) antes de executá-lo. Para usar Adwaita escuro
-com ícones e wallpaper Lyra Enterprise:
+Revise o [install.sh](install.sh) antes de executá-lo. Requer openSUSE
+(`zypper`). Para usar Adwaita escuro com ícones e wallpaper Lyra Enterprise:
 
 ```bash
 curl --proto '=https' --tlsv1.2 -fsSL \
@@ -32,21 +31,23 @@ curl --proto '=https' --tlsv1.2 -fsSL \
   https://raw.githubusercontent.com/britors/Lyra-Theme/main/install.sh | bash -s -- --light
 ```
 
-O instalador detecta o gerenciador de pacotes, instala as dependências, compila
-os arquivos, instala tema, ícones, wallpapers e GRUB, detecta a sessão desktop
-ativa (GNOME, KDE Plasma ou XFCE, via `XDG_CURRENT_DESKTOP`) e ativa o tema de
-ícones correspondente, além do menu de boot. Em XFCE, o instalador também
-aplica o estilo GTK e o tema de janelas (xfwm4) Lyra Enterprise, já que o
-XFCE não tem o mesmo compromisso de compatibilidade com o Adwaita que o
-GNOME. A senha administrativa é solicitada diretamente pelo terminal.
+O instalador instala as dependências via `zypper`, compila os arquivos,
+instala tema, ícones, wallpapers, GRUB e Plymouth, ativa Adwaita com os
+ícones Lyra Enterprise no GNOME, o menu de boot do GRUB e o splash de boot do
+Plymouth, e copia o config do neofetch com o logo ascii da Lyra para
+`~/.config/neofetch/config.conf` (usado assim que o `neofetch` for instalado,
+se ainda não estiver). A senha administrativa é solicitada diretamente pelo
+terminal.
 
 ### Opções
 
 ```text
 --dark          usa Adwaita escuro com ícones e wallpaper Lyra (padrão)
 --light         usa Adwaita claro com ícones e wallpaper Lyra
---no-activate   instala sem modificar preferências do GNOME ou do GRUB
+--no-activate   instala sem modificar preferências do GNOME, do GRUB, do
+                Plymouth ou o config do neofetch
 --no-grub       não instala nem ativa o tema do GRUB
+--no-plymouth   não instala nem ativa o tema do Plymouth
 --uninstall     remove os arquivos e restaura as preferências
 --help          mostra a ajuda
 ```
@@ -61,13 +62,10 @@ curl --proto '=https' --tlsv1.2 -fsSL \
 ## Requisitos
 
 - GNOME 48 ou superior
+- openSUSE, com `zypper`
 - `curl`, `tar`, `xz`, `sassc`, Node.js e ImageMagick 7 com suporte a JXL
 
-O instalador resolve esses pacotes automaticamente em Fedora, openSUSE, Arch e
-Debian/Ubuntu. Testado no Fedora 44, cujos repositórios já trazem
-`ImageMagick` 7.1.2+ com suporte nativo a JXL e `sassc` na versão 3.6.2 — não é
-necessário nenhum repositório adicional (RPM Fusion, COPR etc.) para instalar
-as dependências.
+O instalador resolve esses pacotes automaticamente via `zypper`.
 
 ## Build a partir do repositório
 
@@ -91,27 +89,25 @@ tarball do GitHub), use:
 ```
 
 Aceita as mesmas opções do `install.sh` (`--dark`, `--light`,
-`--no-activate`, `--no-grub`, `--uninstall`), mas não instala dependências de
-build automaticamente — instale `sassc`, Node.js e ImageMagick antes de
-executá-lo.
+`--no-activate`, `--no-grub`, `--no-plymouth`, `--uninstall`), mas não instala
+dependências de build automaticamente — instale `sassc`, Node.js e
+ImageMagick antes de executá-lo.
 
 ## Instalação manual
 
 ```bash
 sudo install -d /usr/share/themes /usr/share/icons \
   /usr/share/backgrounds/lyra /usr/share/gnome-background-properties \
-  /usr/share/grub/themes /usr/share/color-schemes /usr/share/konsole \
-  /usr/share/xfce4/terminal/colorschemes
+  /usr/share/grub/themes /usr/share/plymouth/themes
 sudo cp -a dist/Lyra-Enterprise dist/Lyra-Enterprise-Light /usr/share/themes/
 sudo cp -a dist/Lyra-Enterprise-Icons /usr/share/icons/
 sudo install -m 0644 dist/backgrounds/*.{png,jxl} /usr/share/backgrounds/lyra/
 sudo install -m 0644 dist/gnome-background-properties/lyra-enterprise.xml \
   /usr/share/gnome-background-properties/
 sudo cp -a dist/grub/Lyra-Enterprise /usr/share/grub/themes/
-sudo install -m 0644 dist/kde/color-schemes/*.colors /usr/share/color-schemes/
-sudo install -m 0644 dist/kde/konsole/*.colorscheme /usr/share/konsole/
-sudo install -m 0644 dist/xfce4-terminal/colorschemes/*.theme \
-  /usr/share/xfce4/terminal/colorschemes/
+sudo cp -a dist/plymouth/Lyra-Enterprise /usr/share/plymouth/themes/
+mkdir -p ~/.config/neofetch
+cp dist/neofetch/config.conf ~/.config/neofetch/config.conf
 ```
 
 ## Ativação manual
@@ -140,92 +136,41 @@ gsettings set org.gnome.desktop.interface color-scheme 'prefer-light'
 
 ### GRUB
 
-O instalador ativa o tema em `/etc/default/grub` e regenera o `grub.cfg`. Para
-ativá-lo manualmente, acrescente:
+O instalador ativa o tema em `/etc/default/grub` e regenera o `grub.cfg` com
+`grub2-mkconfig`. Para ativá-lo manualmente, acrescente:
 
 ```bash
 GRUB_THEME="/usr/share/grub/themes/Lyra-Enterprise/theme.txt"
 ```
 
-Depois execute `sudo update-grub` (Debian/Ubuntu), ou
-`sudo grub2-mkconfig -o /boot/grub2/grub.cfg` (Fedora/openSUSE), ou
-`sudo grub-mkconfig -o /boot/grub/grub.cfg` (Arch). O instalador só remove essa
-configuração na desinstalação se ela ainda apontar para o tema Lyra.
+Depois execute `sudo grub2-mkconfig -o /boot/grub2/grub.cfg`. O instalador só
+remove essa configuração na desinstalação se ela ainda apontar para o tema
+Lyra.
 
-### KDE Plasma
+### Plymouth
 
-O instalador sempre grava os esquemas de cores do Plasma e do Konsole em
-`/usr/share/color-schemes` e `/usr/share/konsole`. Numa sessão Plasma
-(`XDG_CURRENT_DESKTOP` contendo `KDE`), a ativação automática aplica o
-esquema de cores Lyra Enterprise (dark ou light, conforme `--dark`/`--light`)
-via `plasma-apply-colorscheme` e o tema de ícones **Lyra-Enterprise-Icons**
-via `plasma-apply-icontheme`, quando esses comandos estão disponíveis; em
-outras sessões, ative manualmente:
+O instalador ativa o tema com `plymouth-set-default-theme -R Lyra-Enterprise`
+(o `-R` já regenera o initramfs) quando esse comando está disponível, e
+guarda o tema anterior para restaurá-lo na desinstalação. Para ativar
+manualmente:
 
 ```bash
-plasma-apply-colorscheme Lyra-Enterprise        # escuro
-plasma-apply-colorscheme Lyra-Enterprise-Light  # claro
-plasma-apply-icontheme Lyra-Enterprise-Icons
+sudo plymouth-set-default-theme -R Lyra-Enterprise
 ```
 
-Ou pelo System Settings: **Aparência > Cores**, selecione **Lyra Enterprise**
-ou **Lyra Enterprise Light**; em **Aparência > Ícones**, selecione **Lyra
-Enterprise Icons**. O esquema de cores do Konsole (**Lyra
-Enterprise**/**Lyra Enterprise Light**) fica disponível em **Configurações do
-Konsole > Editar Perfil Atual > Aparência**.
+### neofetch
 
-### XFCE
-
-O instalador sempre grava o tema do xfwm4 (dentro de `Lyra-Enterprise` e
-`Lyra-Enterprise-Light`, em `/usr/share/themes`) e o esquema de cores do
-xfce4-terminal em `/usr/share/xfce4/terminal/colorschemes`. Numa sessão XFCE
-(`XDG_CURRENT_DESKTOP` contendo `XFCE`), a ativação automática aplica o
-estilo GTK, o tema de ícones e o tema de janelas Lyra Enterprise (dark ou
-light, conforme `--dark`/`--light`) via `xfconf-query`, quando esse comando
-está disponível; em outras sessões, ative manualmente:
+O config em `src/neofetch/config.conf` (copiado para
+`~/.config/neofetch/config.conf` pelo instalador) troca o logo ascii pelo
+mark da Lyra, colorido com a paleta da marca, mantendo o resto das opções
+padrão do neofetch. Para aplicá-lo manualmente:
 
 ```bash
-xfconf-query -c xsettings -p /Net/ThemeName -s Lyra-Enterprise        # estilo GTK
-xfconf-query -c xsettings -p /Net/IconThemeName -s Lyra-Enterprise-Icons
-xfconf-query -c xfwm4 -p /general/theme -s Lyra-Enterprise            # janelas
+mkdir -p ~/.config/neofetch
+cp dist/neofetch/config.conf ~/.config/neofetch/config.conf
 ```
-
-Use `Lyra-Enterprise-Light` para a variante clara. Ou pelo Configurações do
-Aparência do XFCE: aba **Estilo**, selecione **Lyra-Enterprise**; aba
-**Ícones**, selecione **Lyra-Enterprise-Icons**; e no **Configurações do
-Gerenciador de Janelas**, aba **Estilo**, selecione **Lyra-Enterprise**.
-
-O wallpaper e o esquema de cores do terminal não são ativados
-automaticamente: defina o papel de parede em **Configurações do Desktop**
-apontando para `/usr/share/backgrounds/lyra/enterprise.png` (ou
-`enterprise-light.png`), e selecione o esquema de cores em
-**xfce4-terminal > Editar > Preferências > Cores > Predefinições**.
 
 ## Pacotes
-
-### Fedora / RPM
-
-O Fedora recebe um único pacote com temas, ícones e wallpapers. A especificação
-está em `packaging/lyra-enterprise-fedora.spec`. Testado no Fedora 44.
-
-Para instalar o RPM pré-compilado incluído no repositório:
-
-```bash
-sudo dnf install ./lyra-enterprise-1.0.0-1.noarch.rpm
-```
-
-SHA-256: `c239e72a88d26c6db39972c2c5b78599f01ea9f21cf40c927e987f7e55bf28ff`
-
-Para reconstruí-lo no Fedora:
-
-```bash
-sudo dnf install -y rpm-build rpmdevtools ImageMagick nodejs sassc \
-  adwaita-icon-theme
-rpmdev-setuptree
-cp packaging/lyra-enterprise-fedora.spec ~/rpmbuild/SPECS/
-rpmbuild -bb ~/rpmbuild/SPECS/lyra-enterprise-fedora.spec
-sudo dnf install ~/rpmbuild/RPMS/noarch/lyra-enterprise-1.3.0-1*.noarch.rpm
-```
 
 ### openSUSE / RPM
 
@@ -241,10 +186,10 @@ rpmbuild -bb packaging/lyra-enterprise-theme.spec
 rpmbuild -bb packaging/lyra-enterprise-icons.spec
 ```
 
-### Arch Linux / Lyra OS
-
-Use `packaging/PKGBUILD` com `makepkg -si`. O pacote usa Adwaita como fallback
-dos ícones e não executa hooks que alterem configurações pessoais.
+O pacote não executa hooks que alterem configurações pessoais — por isso o
+config do neofetch é instalado como referência em
+`/usr/share/lyra-enterprise-theme/neofetch/config.conf`; copie-o para
+`~/.config/neofetch/config.conf` para usá-lo.
 
 ## Estrutura
 
@@ -255,11 +200,10 @@ src/gtk3/        port GTK 3 e atribuição LGPL
 src/icons/       tema de ícones SVG
 src/wallpaper/   fonte vetorial e metadados GNOME
 src/grub/        tema, fundo e seleção do menu GRUB
-src/kde/         templates do esquema de cores do Plasma e do Konsole
-src/xfwm4/       template do tema de janelas do XFCE
-src/xfce4-terminal/  template do esquema de cores do xfce4-terminal
+src/plymouth/    script, logo e barra de progresso do tema Plymouth
+src/neofetch/    config do neofetch com logo ascii da Lyra
 scripts/         build, validação e empacotamento
-packaging/       PKGBUILD e especificações RPM
+packaging/       especificações RPM
 ```
 
 ## Desinstalação

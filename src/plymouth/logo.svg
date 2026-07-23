@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="220" height="300" viewBox="0 0 220 300">
+  <title>Lyra OS</title>
+  <g transform="translate(30 10)" fill="none" stroke="#e7edf6" stroke-width="8"
+     stroke-linecap="round" stroke-linejoin="round">
+    <path d="M0 0v60c0 44 36 80 80 80s80-36 80-80V0"/>
+    <path d="M0 22h160M0 52h160M80 140v30M50 170h60"/>
+  </g>
+  <text x="110" y="255" fill="#e7edf6" font-family="DejaVu Sans, sans-serif"
+        font-size="30" text-anchor="middle" letter-spacing="6">LYRA OS</text>
+  <text x="110" y="282" fill="#8391a5" font-family="DejaVu Sans, sans-serif"
+        font-size="15" text-anchor="middle">Enterprise boot environment</text>
+</svg>

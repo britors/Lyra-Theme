@@ -1,7 +1,7 @@
 Name:           lyra-enterprise-theme
-Version:        1.3.0
+Version:        1.4.0
 Release:        1%{?dist}
-Summary:        Corporate GNOME, KDE, XFCE and GRUB theme for Lyra OS
+Summary:        Corporate GNOME, GRUB and Plymouth theme for Lyra OS
 License:        GPL-3.0-or-later AND LGPL-2.1-or-later
 URL:            https://github.com/britors/lyra-enterprise-theme
 Source0:        %{name}-%{version}.tar.xz
@@ -12,11 +12,10 @@ BuildRequires:  sassc
 
 %description
 Corporate, flat GNOME 48+ theme with dark and light variants for GNOME Shell,
-GTK 4/libadwaita and GTK 3. Includes matching PNG and JPEG XL wallpapers.
-Also includes the Lyra Enterprise boot menu theme for GRUB 2, dark and
-light Plasma color schemes with matching Konsole color schemes for KDE, and
-an xfwm4 window manager theme with a matching xfce4-terminal color scheme
-for XFCE.
+GTK 4/libadwaita and GTK 3. Includes matching PNG and JPEG XL wallpapers, the
+Lyra Enterprise boot menu theme for GRUB 2, a matching Plymouth boot splash
+theme, and a neofetch config with a Lyra ascii logo (installed as a
+reference file; copy it into ~/.config/neofetch/config.conf to use it).
 
 %prep
 %autosetup
@@ -39,15 +38,12 @@ install -m 0644 dist/gnome-background-properties/lyra-enterprise.xml \
 install -d %{buildroot}%{_datadir}/grub/themes
 cp -a dist/grub/Lyra-Enterprise %{buildroot}%{_datadir}/grub/themes/
 
-install -d %{buildroot}%{_datadir}/color-schemes %{buildroot}%{_datadir}/konsole
-install -m 0644 dist/kde/color-schemes/*.colors \
-  %{buildroot}%{_datadir}/color-schemes/
-install -m 0644 dist/kde/konsole/*.colorscheme \
-  %{buildroot}%{_datadir}/konsole/
+install -d %{buildroot}%{_datadir}/plymouth/themes
+cp -a dist/plymouth/Lyra-Enterprise %{buildroot}%{_datadir}/plymouth/themes/
 
-install -d %{buildroot}%{_datadir}/xfce4/terminal/colorschemes
-install -m 0644 dist/xfce4-terminal/colorschemes/*.theme \
-  %{buildroot}%{_datadir}/xfce4/terminal/colorschemes/
+install -d %{buildroot}%{_datadir}/%{name}/neofetch
+install -m 0644 dist/neofetch/config.conf \
+  %{buildroot}%{_datadir}/%{name}/neofetch/config.conf
 
 %files
 %license LICENSE src/gtk3/COPYING.LGPL
@@ -60,14 +56,15 @@ install -m 0644 dist/xfce4-terminal/colorschemes/*.theme \
 %{_datadir}/backgrounds/lyra/enterprise-light.jxl
 %{_datadir}/gnome-background-properties/lyra-enterprise.xml
 %{_datadir}/grub/themes/Lyra-Enterprise/
-%{_datadir}/color-schemes/Lyra-Enterprise.colors
-%{_datadir}/color-schemes/Lyra-Enterprise-Light.colors
-%{_datadir}/konsole/Lyra-Enterprise.colorscheme
-%{_datadir}/konsole/Lyra-Enterprise-Light.colorscheme
-%{_datadir}/xfce4/terminal/colorschemes/Lyra-Enterprise.theme
-%{_datadir}/xfce4/terminal/colorschemes/Lyra-Enterprise-Light.theme
+%{_datadir}/plymouth/themes/Lyra-Enterprise/
+%{_datadir}/%{name}/neofetch/config.conf
 
 %changelog
+* Thu Jul 23 2026 Lyra OS Team <contact@lyraos.dev> - 1.4.0-1
+- Add Plymouth boot theme matching GRUB, and a neofetch config with a Lyra
+  ascii logo
+- Drop KDE Plasma/Konsole and XFCE support to focus on GNOME
+
 * Tue Jul 21 2026 Lyra OS Team <contact@lyraos.dev> - 1.3.0-1
 - Add xfwm4 window theme and xfce4-terminal color scheme for XFCE
 

@@ -15,7 +15,7 @@ compile_scss() {
   fi
 
   # Minimal deterministic fallback for release builders without sassc. Sources
-  # intentionally use only variables supported here; Arch packaging uses sassc.
+  # intentionally use only variables supported here; RPM packaging uses sassc.
   cp "$source" "$output"
   # Replace longer variable names first so, for example, $ent-surface does
   # not corrupt $ent-surface-raised. A second pass resolves token aliases.
@@ -49,10 +49,15 @@ render_wallpaper() {
       -e "s/@ENT_BRAND_START@/$brand_start/g" -e "s/@ENT_BRAND_END@/$brand_end/g" \
       -e "s/@ENT_WATERMARK_OPACITY@/$watermark_opacity/g" \
       "$root/src/wallpaper/enterprise.svg" > "$dist/backgrounds/$stem.svg"
-  magick -background none "$dist/backgrounds/$stem.svg" -resize 3840x2160! \
+  im -background none "$dist/backgrounds/$stem.svg" -resize 3840x2160! \
     -strip -define png:color-type=2 "$dist/backgrounds/$stem.png"
-  magick "$dist/backgrounds/$stem.png" -quality 92 "$dist/backgrounds/$stem.jxl"
+  im "$dist/backgrounds/$stem.png" -quality 92 "$dist/backgrounds/$stem.jxl"
 }
+
+command -v magick >/dev/null 2>&1 || { echo 'error: ImageMagick is required' >&2; exit 1; }
+# Exported so scripts/build-plymouth.sh (run as a separate process below) can use it too.
+im() { magick "$@"; }
+export -f im
 
 rm -rf "$dist"
 for variant in Lyra-Enterprise Lyra-Enterprise-Light; do
@@ -61,6 +66,7 @@ for variant in Lyra-Enterprise Lyra-Enterprise-Light; do
 done
 mkdir -p "$dist/backgrounds" "$dist/gnome-background-properties"
 mkdir -p "$dist/grub/Lyra-Enterprise"
+mkdir -p "$dist/neofetch"
 
 compile_scss "$root/src/shell/_tokens-dark.scss" "$root/src/shell/gnome-shell.scss" \
   "$dist/Lyra-Enterprise/gnome-shell/gnome-shell.css"
@@ -69,20 +75,19 @@ compile_scss "$root/src/shell/_tokens-light.scss" "$root/src/shell/gnome-shell.s
 cp "$root/src/gtk4/gtk-dark.css" "$dist/Lyra-Enterprise/gtk-4.0/gtk.css"
 cp "$root/src/gtk4/gtk-light.css" "$dist/Lyra-Enterprise-Light/gtk-4.0/gtk.css"
 "$root/scripts/build-gtk3.sh" "$dist"
-"$root/scripts/build-kde.sh" "$dist"
-"$root/scripts/build-xfce.sh" "$dist"
+"$root/scripts/build-plymouth.sh" "$dist"
+cp "$root/src/neofetch/config.conf" "$dist/neofetch/"
 
-command -v magick >/dev/null 2>&1 || { echo 'error: ImageMagick is required' >&2; exit 1; }
 render_wallpaper "$root/src/shell/_tokens-dark.scss" enterprise
 render_wallpaper "$root/src/shell/_tokens-light.scss" enterprise-light
 cp "$root/src/wallpaper/lyra-enterprise.xml" "$dist/gnome-background-properties/"
 
 cp "$root/src/grub/theme.txt" "$dist/grub/Lyra-Enterprise/"
-magick -background none "$root/src/grub/background.svg" -resize 1920x1080! \
+im -background none "$root/src/grub/background.svg" -resize 1920x1080! \
   -strip -define png:color-type=2 "$dist/grub/Lyra-Enterprise/background.png"
 # GRUB stretches the middle segment between the fixed left/right caps.
 for part in c e n ne nw s se sw w; do
-  magick -background none "$root/src/grub/select.svg" -resize 2x2! -strip \
+  im -background none "$root/src/grub/select.svg" -resize 2x2! -strip \
     "$dist/grub/Lyra-Enterprise/select_${part}.png"
 done
 
