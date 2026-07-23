@@ -2,7 +2,12 @@
 set -Eeuo pipefail
 
 repo_alias='home_rodrigosbrito_lyra'
-repo_url='https://download.opensuse.org/repositories/home:/rodrigosbrito:/lyra/openSUSE_Leap_16.0/home:rodrigosbrito:lyra.repo'
+# Base repodata directory, not the .repo indirection file: "zypper ar <url>
+# <alias>" with an explicit alias treats the URL as the repo's literal
+# baseurl instead of downloading and parsing it as a .repo definition, so
+# pointing it at the .repo file itself fails with "Repository type can't
+# be determined".
+repo_url='https://download.opensuse.org/repositories/home:/rodrigosbrito:/lyra/openSUSE_Leap_16.0/'
 install=1
 
 usage() {
