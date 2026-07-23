@@ -59,13 +59,28 @@ install -m 0644 dist/neofetch/config.conf \
 %doc README.md src/gtk3/ATTRIBUTION.md
 %{_datadir}/themes/Lyra-Enterprise/
 %{_datadir}/themes/Lyra-Enterprise-Light/
+# %dir on backgrounds/gnome-background-properties/grub/plymouth: none of
+# these come from a Requires of this package (no grub2/plymouth runtime
+# dependency, since the theme is meant to be optional on top of whatever
+# bootloader/splash the system already has), so nothing else is
+# guaranteed to own the parent dirs — the build's unowned-directory check
+# fails without these.
+%dir %{_datadir}/backgrounds
+%dir %{_datadir}/backgrounds/lyra
 %{_datadir}/backgrounds/lyra/enterprise.png
 %{_datadir}/backgrounds/lyra/enterprise.jxl
 %{_datadir}/backgrounds/lyra/enterprise-light.png
 %{_datadir}/backgrounds/lyra/enterprise-light.jxl
+%dir %{_datadir}/gnome-background-properties
 %{_datadir}/gnome-background-properties/lyra-enterprise.xml
+%dir %{_datadir}/grub
+%dir %{_datadir}/grub/themes
 %{_datadir}/grub/themes/Lyra-Enterprise/
+%dir %{_datadir}/plymouth
+%dir %{_datadir}/plymouth/themes
 %{_datadir}/plymouth/themes/Lyra-Enterprise/
+%dir %{_datadir}/%{name}
+%dir %{_datadir}/%{name}/neofetch
 %{_datadir}/%{name}/neofetch/config.conf
 
 %changelog
