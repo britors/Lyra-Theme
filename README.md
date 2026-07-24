@@ -31,6 +31,23 @@ curl --proto '=https' --tlsv1.2 -fsSL \
   https://raw.githubusercontent.com/britors/Lyra-Theme/main/install.sh | bash -s -- --light
 ```
 
+### Instalação pelos pacotes RPM
+
+Para adicionar o repositório OBS, instalar os RPMs e ativar automaticamente
+os ícones, wallpapers, GRUB, Plymouth e a configuração do Neofetch:
+
+```bash
+curl --proto '=https' --tlsv1.2 -fsSL \
+  https://raw.githubusercontent.com/britors/Lyra-Theme/main/install-rpm.sh | bash
+```
+
+Para usar a variante clara:
+
+```bash
+curl --proto '=https' --tlsv1.2 -fsSL \
+  https://raw.githubusercontent.com/britors/Lyra-Theme/main/install-rpm.sh | bash -s -- --light
+```
+
 O instalador instala as dependências via `zypper`, compila os arquivos,
 instala tema, ícones, wallpapers, GRUB e Plymouth, ativa Adwaita com os
 ícones Lyra Enterprise no GNOME, o menu de boot do GRUB e o splash de boot do
@@ -186,10 +203,13 @@ rpmbuild -bb packaging/lyra-enterprise-theme.spec
 rpmbuild -bb packaging/lyra-enterprise-icons.spec
 ```
 
-O pacote não executa hooks que alterem configurações pessoais — por isso o
-config do neofetch é instalado como referência em
-`/usr/share/lyra-enterprise-theme/neofetch/config.conf`; copie-o para
-`~/.config/neofetch/config.conf` para usá-lo.
+O pacote ativa os temas do GRUB e do Plymouth e instala os ícones e wallpapers
+como padrões do GNOME. Perfis existentes que já tenham preferências próprias
+não são sobrescritos pelo RPM. O config do Neofetch é instalado em `/etc/skel`
+para novos usuários e como referência em
+`/usr/share/lyra-enterprise-theme/neofetch/config.conf`. Use o
+`install-rpm.sh` acima para aplicar todas essas configurações também ao usuário
+atual.
 
 ## Estrutura
 
