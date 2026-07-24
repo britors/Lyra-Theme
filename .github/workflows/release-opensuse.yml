@@ -20,7 +20,7 @@ jobs:
     steps:
       - name: Instalar dependências de build
         run: |
-          zypper --non-interactive install -y tar gzip git sassc ImageMagick nodejs \
+          zypper --non-interactive install -y tar gzip git sassc ImageMagick nodejs rsvg-convert \
             rpm-build rpmdevtools
 
       - uses: actions/checkout@v4
@@ -52,6 +52,11 @@ jobs:
           test -f /usr/share/plymouth/themes/Lyra-Enterprise/lyra-enterprise.plymouth
           test -f /usr/share/grub/themes/Lyra-Enterprise/theme.txt
           test -d /usr/share/icons/Lyra-Enterprise-Icons
+          test -f /usr/share/glib-2.0/schemas/99-lyra-enterprise.gschema.override
+          test -f /etc/skel/.config/neofetch/config.conf
+          grep -Fqx 'GRUB_THEME="/usr/share/grub/themes/Lyra-Enterprise/theme.txt"' \
+            /etc/default/grub
+          test "$(plymouth-set-default-theme)" = Lyra-Enterprise
 
       - uses: actions/upload-artifact@v4
         with:

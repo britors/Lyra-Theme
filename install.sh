@@ -112,12 +112,13 @@ install_dependencies() {
   say 'Installing build and runtime dependencies'
   command -v zypper >/dev/null 2>&1 || die 'This installer supports openSUSE (zypper) only.'
   sudo zypper --non-interactive install \
-    curl tar xz ImageMagick nodejs sassc
+    curl tar xz ImageMagick nodejs rsvg-convert sassc
 }
 
 install_dependencies
 command -v curl >/dev/null 2>&1 || die 'curl was not installed'
 command -v magick >/dev/null 2>&1 || die 'ImageMagick 7 (magick) is required'
+command -v rsvg-convert >/dev/null 2>&1 || die 'rsvg-convert is required'
 
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
