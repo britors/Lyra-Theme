@@ -54,6 +54,8 @@ jobs:
           test -d /usr/share/icons/Lyra-Enterprise-Icons
           test -f /usr/share/glib-2.0/schemas/99-lyra-enterprise.gschema.override
           test -f /etc/skel/.config/neofetch/config.conf
+          test -f /etc/skel/.config/fastfetch/config.jsonc
+          test -f /usr/share/lyra-enterprise-theme/fastfetch/logo.txt
           grep -Fqx 'GRUB_THEME="/usr/share/grub/themes/Lyra-Enterprise/theme.txt"' \
             /etc/default/grub
           test "$(plymouth-set-default-theme)" = Lyra-Enterprise

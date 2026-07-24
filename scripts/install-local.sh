@@ -65,7 +65,8 @@ if ((uninstall)); then
     /usr/share/themes/Lyra-Enterprise-Light \
     /usr/share/icons/Lyra-Enterprise-Icons \
     /usr/share/grub/themes/Lyra-Enterprise \
-    /usr/share/plymouth/themes/Lyra-Enterprise
+    /usr/share/plymouth/themes/Lyra-Enterprise \
+    /usr/share/lyra-enterprise-theme
   sudo rm -f /usr/share/backgrounds/lyra/enterprise.png \
     /usr/share/backgrounds/lyra/enterprise-light.png \
     /usr/share/backgrounds/lyra/enterprise.jxl \
@@ -102,6 +103,12 @@ if ((uninstall)); then
     else
       rm -f "$HOME/.config/neofetch/config.conf"
     fi
+    if [[ -f "$HOME/.config/fastfetch/config.jsonc.lyra-theme-backup" ]]; then
+      mv "$HOME/.config/fastfetch/config.jsonc.lyra-theme-backup" \
+        "$HOME/.config/fastfetch/config.jsonc"
+    else
+      rm -f "$HOME/.config/fastfetch/config.jsonc"
+    fi
   fi
   say 'Uninstall complete'
   exit 0
@@ -116,7 +123,8 @@ say 'Building theme, icons, wallpapers, GRUB theme and Plymouth theme'
 
 say 'Installing system files'
 sudo install -d /usr/share/themes /usr/share/icons \
-  /usr/share/backgrounds/lyra /usr/share/gnome-background-properties
+  /usr/share/backgrounds/lyra /usr/share/gnome-background-properties \
+  /usr/share/lyra-enterprise-theme/fastfetch
 sudo cp -a "$root/dist/Lyra-Enterprise" \
   "$root/dist/Lyra-Enterprise-Light" /usr/share/themes/
 sudo cp -a "$root/dist/Lyra-Enterprise-Icons" /usr/share/icons/
@@ -125,6 +133,9 @@ sudo install -m 0644 "$root"/dist/backgrounds/*.{png,jxl} \
 sudo install -m 0644 \
   "$root/dist/gnome-background-properties/lyra-enterprise.xml" \
   /usr/share/gnome-background-properties/
+sudo install -m 0644 "$root/dist/fastfetch/config.jsonc" \
+  "$root/dist/fastfetch/logo.txt" \
+  /usr/share/lyra-enterprise-theme/fastfetch/
 if ((grub)); then
   sudo install -d /usr/share/grub/themes
   sudo cp -a "$root/dist/grub/Lyra-Enterprise" /usr/share/grub/themes/
@@ -145,6 +156,16 @@ if ((activate)); then
       "$HOME/.config/neofetch/config.conf.lyra-theme-backup"
   fi
   cp "$root/dist/neofetch/config.conf" "$HOME/.config/neofetch/config.conf"
+
+  say 'Installing Lyra Fastfetch config'
+  mkdir -p "$HOME/.config/fastfetch"
+  if [[ -f "$HOME/.config/fastfetch/config.jsonc" && \
+      ! -f "$HOME/.config/fastfetch/config.jsonc.lyra-theme-backup" ]]; then
+    cp "$HOME/.config/fastfetch/config.jsonc" \
+      "$HOME/.config/fastfetch/config.jsonc.lyra-theme-backup"
+  fi
+  cp "$root/dist/fastfetch/config.jsonc" \
+    "$HOME/.config/fastfetch/config.jsonc"
 fi
 
 if ((activate)) && command -v gsettings >/dev/null 2>&1; then

@@ -11,7 +11,7 @@ wallpapers Lyra Enterprise.
 - Wallpapers dark e light em PNG e JPEG XL, 3840×2160
 - Tema do GRUB 2 com fundo Full HD e menu de boot Lyra Enterprise
 - Tema de boot do Plymouth com o mesmo fundo e logo do GRUB
-- Config do neofetch com logo ascii da Lyra e cores da marca
+- Configs do Fastfetch e Neofetch com logo ascii da Lyra e cores da marca
 - Pacotes RPM para openSUSE
 
 ## Instalação rápida
@@ -34,7 +34,8 @@ curl --proto '=https' --tlsv1.2 -fsSL \
 ### Instalação pelos pacotes RPM
 
 Para adicionar o repositório OBS, instalar os RPMs e ativar automaticamente
-os ícones, wallpapers, GRUB, Plymouth e a configuração do Neofetch:
+os ícones, wallpapers, GRUB, Plymouth e as configurações do Fastfetch e
+Neofetch:
 
 ```bash
 curl --proto '=https' --tlsv1.2 -fsSL \
@@ -51,10 +52,9 @@ curl --proto '=https' --tlsv1.2 -fsSL \
 O instalador instala as dependências via `zypper`, compila os arquivos,
 instala tema, ícones, wallpapers, GRUB e Plymouth, ativa Adwaita com os
 ícones Lyra Enterprise no GNOME, o menu de boot do GRUB e o splash de boot do
-Plymouth, e copia o config do neofetch com o logo ascii da Lyra para
-`~/.config/neofetch/config.conf` (usado assim que o `neofetch` for instalado,
-se ainda não estiver). A senha administrativa é solicitada diretamente pelo
-terminal.
+Plymouth, e copia os configs do Fastfetch e Neofetch com o logo ascii da Lyra
+para o perfil atual. Configurações existentes recebem um backup antes da
+substituição. A senha administrativa é solicitada diretamente pelo terminal.
 
 ### Opções
 
@@ -62,7 +62,7 @@ terminal.
 --dark          usa Adwaita escuro com ícones e wallpaper Lyra (padrão)
 --light         usa Adwaita claro com ícones e wallpaper Lyra
 --no-activate   instala sem modificar preferências do GNOME, do GRUB, do
-                Plymouth ou o config do neofetch
+                Plymouth ou os configs do Fastfetch e Neofetch
 --no-grub       não instala nem ativa o tema do GRUB
 --no-plymouth   não instala nem ativa o tema do Plymouth
 --uninstall     remove os arquivos e restaura as preferências
@@ -109,14 +109,15 @@ tarball do GitHub), use:
 Aceita as mesmas opções do `install.sh` (`--dark`, `--light`,
 `--no-activate`, `--no-grub`, `--no-plymouth`, `--uninstall`), mas não instala
 dependências de build automaticamente — instale `sassc`, Node.js e
-ImageMagick antes de executá-lo.
+`rsvg-convert` e ImageMagick antes de executá-lo.
 
 ## Instalação manual
 
 ```bash
 sudo install -d /usr/share/themes /usr/share/icons \
   /usr/share/backgrounds/lyra /usr/share/gnome-background-properties \
-  /usr/share/grub/themes /usr/share/plymouth/themes
+  /usr/share/grub/themes /usr/share/plymouth/themes \
+  /usr/share/lyra-enterprise-theme/fastfetch
 sudo cp -a dist/Lyra-Enterprise dist/Lyra-Enterprise-Light /usr/share/themes/
 sudo cp -a dist/Lyra-Enterprise-Icons /usr/share/icons/
 sudo install -m 0644 dist/backgrounds/*.{png,jxl} /usr/share/backgrounds/lyra/
@@ -124,8 +125,11 @@ sudo install -m 0644 dist/gnome-background-properties/lyra-enterprise.xml \
   /usr/share/gnome-background-properties/
 sudo cp -a dist/grub/Lyra-Enterprise /usr/share/grub/themes/
 sudo cp -a dist/plymouth/Lyra-Enterprise /usr/share/plymouth/themes/
+sudo cp -a dist/fastfetch/. /usr/share/lyra-enterprise-theme/fastfetch/
 mkdir -p ~/.config/neofetch
 cp dist/neofetch/config.conf ~/.config/neofetch/config.conf
+mkdir -p ~/.config/fastfetch
+cp dist/fastfetch/config.jsonc ~/.config/fastfetch/config.jsonc
 ```
 
 ## Ativação manual
@@ -188,6 +192,17 @@ mkdir -p ~/.config/neofetch
 cp dist/neofetch/config.conf ~/.config/neofetch/config.conf
 ```
 
+### Fastfetch
+
+O config em `src/fastfetch/config.jsonc` usa o logo ascii Lyra localizado em
+`/usr/share/lyra-enterprise-theme/fastfetch/logo.txt`. O instalador cria um
+backup do config atual antes de ativá-lo. Para aplicar manualmente:
+
+```bash
+mkdir -p ~/.config/fastfetch
+cp dist/fastfetch/config.jsonc ~/.config/fastfetch/config.jsonc
+```
+
 ## Pacotes
 
 ### openSUSE / RPM
@@ -206,11 +221,10 @@ rpmbuild -bb packaging/lyra-enterprise-icons.spec
 
 O pacote ativa os temas do GRUB e do Plymouth e instala os ícones e wallpapers
 como padrões do GNOME. Perfis existentes que já tenham preferências próprias
-não são sobrescritos pelo RPM. O config do Neofetch é instalado em `/etc/skel`
-para novos usuários e como referência em
-`/usr/share/lyra-enterprise-theme/neofetch/config.conf`. Use o
-`install-rpm.sh` acima para aplicar todas essas configurações também ao usuário
-atual.
+não são sobrescritos pelo RPM. Os configs do Fastfetch e Neofetch são
+instalados em `/etc/skel` para novos usuários e como referências em
+`/usr/share/lyra-enterprise-theme/`. Use o `install-rpm.sh` acima para aplicar
+todas essas configurações também ao usuário atual.
 
 ## Estrutura
 
@@ -223,6 +237,7 @@ src/wallpaper/   fonte vetorial e metadados GNOME
 src/grub/        tema, fundo e seleção do menu GRUB
 src/plymouth/    script, logo e barra de progresso do tema Plymouth
 src/neofetch/    config do neofetch com logo ascii da Lyra
+src/fastfetch/   config e logo ascii para o Fastfetch
 scripts/         build, validação e empacotamento
 packaging/       especificações RPM
 ```

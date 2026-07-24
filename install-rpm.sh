@@ -31,6 +31,7 @@ die() { printf '\033[1;31merror:\033[0m %s\n' "$*" >&2; exit 1; }
 
 command -v zypper >/dev/null 2>&1 || die 'This installer supports openSUSE (zypper) only.'
 command -v sudo >/dev/null 2>&1 || die 'sudo is required'
+command -v curl >/dev/null 2>&1 || die 'curl is required'
 
 if ! sudo -n true 2>/dev/null; then
   say 'Administrator authentication is required'
@@ -47,6 +48,23 @@ sudo zypper --gpg-auto-import-keys refresh "$repo_alias"
 say 'Installing the Lyra theme and icon packages'
 sudo zypper --non-interactive install \
   lyra-enterprise-theme lyra-enterprise-icons
+
+fastfetch_share=/usr/share/lyra-enterprise-theme/fastfetch
+if [[ ! -f "$fastfetch_share/config.jsonc" || \
+      ! -f "$fastfetch_share/logo.txt" ]]; then
+  say 'Installing the Lyra Fastfetch assets'
+  fastfetch_tmp=$(mktemp -d)
+  trap 'rm -rf "$fastfetch_tmp"' EXIT
+  curl --proto '=https' --tlsv1.2 -fsSL \
+    https://raw.githubusercontent.com/britors/Lyra-Theme/main/src/fastfetch/config.jsonc \
+    -o "$fastfetch_tmp/config.jsonc"
+  curl --proto '=https' --tlsv1.2 -fsSL \
+    https://raw.githubusercontent.com/britors/Lyra-Theme/main/src/fastfetch/logo.txt \
+    -o "$fastfetch_tmp/logo.txt"
+  sudo install -d "$fastfetch_share"
+  sudo install -m 0644 "$fastfetch_tmp/config.jsonc" \
+    "$fastfetch_tmp/logo.txt" "$fastfetch_share/"
+fi
 
 if command -v gsettings >/dev/null 2>&1; then
   say 'Activating Lyra icons and wallpapers'
@@ -77,6 +95,18 @@ if [[ -f /usr/share/lyra-enterprise-theme/neofetch/config.conf ]]; then
   fi
   cp /usr/share/lyra-enterprise-theme/neofetch/config.conf \
     "$HOME/.config/neofetch/config.conf"
+fi
+
+if [[ -f /usr/share/lyra-enterprise-theme/fastfetch/config.jsonc ]]; then
+  say 'Activating the Lyra Fastfetch configuration'
+  mkdir -p "$HOME/.config/fastfetch"
+  if [[ -f "$HOME/.config/fastfetch/config.jsonc" && \
+      ! -f "$HOME/.config/fastfetch/config.jsonc.lyra-theme-backup" ]]; then
+    cp "$HOME/.config/fastfetch/config.jsonc" \
+      "$HOME/.config/fastfetch/config.jsonc.lyra-theme-backup"
+  fi
+  cp /usr/share/lyra-enterprise-theme/fastfetch/config.jsonc \
+    "$HOME/.config/fastfetch/config.jsonc"
 fi
 
 if [[ -f /etc/default/grub ]]; then
