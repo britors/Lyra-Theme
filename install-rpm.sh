@@ -31,7 +31,6 @@ die() { printf '\033[1;31merror:\033[0m %s\n' "$*" >&2; exit 1; }
 
 command -v zypper >/dev/null 2>&1 || die 'This installer supports openSUSE (zypper) only.'
 command -v sudo >/dev/null 2>&1 || die 'sudo is required'
-command -v curl >/dev/null 2>&1 || die 'curl is required'
 
 if ! sudo -n true 2>/dev/null; then
   say 'Administrator authentication is required'
@@ -47,7 +46,9 @@ sudo zypper --gpg-auto-import-keys refresh "$repo_alias"
 
 say 'Installing the Lyra theme and icon packages'
 sudo zypper --non-interactive install \
+  curl fastfetch glib2-tools gnome-shell-extension-user-theme \
   lyra-enterprise-theme lyra-enterprise-icons
+command -v curl >/dev/null 2>&1 || die 'curl was not installed'
 
 fastfetch_share=/usr/share/lyra-enterprise-theme/fastfetch
 if [[ ! -f "$fastfetch_share/config.jsonc" || \

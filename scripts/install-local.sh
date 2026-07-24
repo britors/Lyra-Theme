@@ -11,7 +11,8 @@ gdm=1
 
 usage() {
   cat <<'EOF'
-Lyra Enterprise local installer (builds from this checkout)
+Lyra Enterprise local installer (builds from this checkout, installs build
+and runtime dependencies via zypper)
 
 Usage: install-local.sh [--dark|--light] [--no-activate] [--no-grub]
                          [--no-plymouth] [--no-gdm] [--uninstall]
@@ -124,8 +125,24 @@ if ((uninstall)); then
   exit 0
 fi
 
+install_dependencies() {
+  say 'Installing build and runtime dependencies'
+  command -v zypper >/dev/null 2>&1 || die 'This installer supports openSUSE (zypper) only.'
+  local packages=(
+    adwaita-icon-theme fastfetch glib2-tools gtk3-tools
+    ImageMagick nodejs rsvg-convert sassc
+  )
+  ((grub)) && packages+=(grub2)
+  ((plymouth)) && packages+=(plymouth-plugin-script plymouth-scripts)
+  ((gdm)) && packages+=(dconf gnome-shell-extension-user-theme)
+  sudo zypper --non-interactive install "${packages[@]}"
+}
+
+install_dependencies
 command -v magick >/dev/null 2>&1 || die 'ImageMagick 7 (magick) is required'
+command -v node >/dev/null 2>&1 || die 'Node.js is required'
 command -v rsvg-convert >/dev/null 2>&1 || die 'rsvg-convert is required'
+command -v sassc >/dev/null 2>&1 || die 'sassc is required'
 
 say 'Building theme, icons, wallpapers, GRUB theme and Plymouth theme'
 "$root/scripts/build.sh"

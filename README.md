@@ -85,11 +85,11 @@ curl --proto '=https' --tlsv1.2 -fsSL \
 
 - GNOME 48 ou superior
 - openSUSE, com `zypper`
-- `curl`, `tar`, `xz`, `sassc`, Node.js, `rsvg-convert` e ImageMagick 7 com
-  suporte a JXL
-- `dconf` (já instalado em qualquer sistema GNOME) para o tema do GDM
-- `gnome-shell-extension-user-theme` para as cores do Shell no GDM (sem ela,
-  o GDM recebe ícones e wallpaper, mas mantém as cores padrão do Shell)
+- `curl`, `tar`, `gzip`, `xz`, `sassc`, Node.js, `rsvg-convert` e ImageMagick
+  7 com suporte a JXL
+- `glib2-tools`, `gtk3-tools`, `adwaita-icon-theme` e `fastfetch`
+- `grub2`, `plymouth-scripts` e `plymouth-plugin-script` para os temas de boot
+- `dconf` e `gnome-shell-extension-user-theme` para o tema do GDM
 
 O instalador resolve esses pacotes automaticamente via `zypper`.
 
@@ -115,10 +115,10 @@ tarball do GitHub), use:
 ```
 
 Aceita as mesmas opções do `install.sh` (`--dark`, `--light`,
-`--no-activate`, `--no-grub`, `--no-plymouth`, `--no-gdm`, `--uninstall`), mas
-não instala dependências de build automaticamente — instale `sassc`, Node.js,
-`rsvg-convert` e ImageMagick antes de executá-lo. Para as cores do Shell no
-GDM, instale também `gnome-shell-extension-user-theme`.
+`--no-activate`, `--no-grub`, `--no-plymouth`, `--no-gdm`, `--uninstall`) e
+também instala as dependências de build via `zypper` (`sassc`, Node.js,
+`rsvg-convert`, ImageMagick) e todas as dependências de execução dos
+componentes habilitados.
 
 ## Instalação manual
 

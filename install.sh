@@ -128,16 +128,22 @@ fi
 install_dependencies() {
   say 'Installing build and runtime dependencies'
   command -v zypper >/dev/null 2>&1 || die 'This installer supports openSUSE (zypper) only.'
-  sudo zypper --non-interactive install \
-    curl tar xz fastfetch ImageMagick nodejs rsvg-convert sassc
-  sudo zypper --non-interactive install gnome-shell-extension-user-theme 2>/dev/null || \
-    say 'gnome-shell-extension-user-theme not available; GDM will keep default Shell colors'
+  local packages=(
+    adwaita-icon-theme curl fastfetch glib2-tools gtk3-tools gzip
+    ImageMagick nodejs rsvg-convert sassc tar xz
+  )
+  ((grub)) && packages+=(grub2)
+  ((plymouth)) && packages+=(plymouth-plugin-script plymouth-scripts)
+  ((gdm)) && packages+=(dconf gnome-shell-extension-user-theme)
+  sudo zypper --non-interactive install "${packages[@]}"
 }
 
 install_dependencies
 command -v curl >/dev/null 2>&1 || die 'curl was not installed'
 command -v magick >/dev/null 2>&1 || die 'ImageMagick 7 (magick) is required'
+command -v node >/dev/null 2>&1 || die 'Node.js is required'
 command -v rsvg-convert >/dev/null 2>&1 || die 'rsvg-convert is required'
+command -v sassc >/dev/null 2>&1 || die 'sassc is required'
 
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
