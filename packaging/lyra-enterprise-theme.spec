@@ -11,6 +11,7 @@ BuildRequires:  nodejs
 BuildRequires:  rsvg-convert
 BuildRequires:  sassc
 Requires:       lyra-enterprise-icons
+Requires:       plymouth-plugin-script
 Requires(post): grub2
 Requires(preun): grub2
 Requires(post): plymouth-scripts
