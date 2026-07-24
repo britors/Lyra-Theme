@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE policymap>
+<policymap>
+  <!-- The build only reads trusted SVG files shipped in this repository. -->
+  <policy domain="coder" rights="read" pattern="SVG"/>
+</policymap>

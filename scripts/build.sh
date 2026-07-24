@@ -55,6 +55,9 @@ render_wallpaper() {
 }
 
 command -v magick >/dev/null 2>&1 || { echo 'error: ImageMagick is required' >&2; exit 1; }
+# Limit the SVG policy exception to this build. All SVG inputs are trusted files
+# from this repository or deterministic derivatives generated above.
+export MAGICK_CONFIGURE_PATH="$root/config/imagemagick"
 # Exported so scripts/build-plymouth.sh (run as a separate process below) can use it too.
 im() { magick "$@"; }
 export -f im
