@@ -11,6 +11,8 @@ wallpapers Lyra Enterprise.
 - Wallpapers dark e light em PNG e JPEG XL, 3840×2160
 - Tema do GRUB 2 com fundo Full HD e menu de boot Lyra Enterprise
 - Tema de boot do Plymouth com o mesmo fundo e logo do GRUB
+- Tela de login do GDM com ícones, wallpaper e cores do GNOME Shell Lyra
+  Enterprise
 - Configs do Fastfetch e Neofetch com logo ascii da Lyra e cores da marca
 - Pacotes RPM para openSUSE
 
@@ -34,7 +36,7 @@ curl --proto '=https' --tlsv1.2 -fsSL \
 ### Instalação pelos pacotes RPM
 
 Para adicionar o repositório OBS, instalar os RPMs e ativar automaticamente
-os ícones, wallpapers, GRUB, Plymouth e as configurações do Fastfetch e
+os ícones, wallpapers, GRUB, Plymouth, o GDM e as configurações do Fastfetch e
 Neofetch:
 
 ```bash
@@ -50,11 +52,13 @@ curl --proto '=https' --tlsv1.2 -fsSL \
 ```
 
 O instalador instala as dependências via `zypper`, compila os arquivos,
-instala tema, ícones, wallpapers, GRUB e Plymouth, ativa Adwaita com os
-ícones Lyra Enterprise no GNOME, o menu de boot do GRUB e o splash de boot do
-Plymouth, e copia os configs do Fastfetch e Neofetch com o logo ascii da Lyra
-para o perfil atual. Configurações existentes recebem um backup antes da
-substituição. A senha administrativa é solicitada diretamente pelo terminal.
+instala tema, ícones, wallpapers, GRUB, Plymouth e a tela de login do GDM,
+ativa Adwaita com os ícones Lyra Enterprise no GNOME, o menu de boot do GRUB,
+o splash de boot do Plymouth e o tema Lyra Enterprise no GDM (ícones,
+wallpaper e cores do Shell), e copia os configs do Fastfetch e Neofetch com o
+logo ascii da Lyra para o perfil atual. Configurações existentes recebem um
+backup antes da substituição. A senha administrativa é solicitada diretamente
+pelo terminal.
 
 ### Opções
 
@@ -62,9 +66,10 @@ substituição. A senha administrativa é solicitada diretamente pelo terminal.
 --dark          usa Adwaita escuro com ícones e wallpaper Lyra (padrão)
 --light         usa Adwaita claro com ícones e wallpaper Lyra
 --no-activate   instala sem modificar preferências do GNOME, do GRUB, do
-                Plymouth ou os configs do Fastfetch e Neofetch
+                Plymouth, do GDM ou os configs do Fastfetch e Neofetch
 --no-grub       não instala nem ativa o tema do GRUB
 --no-plymouth   não instala nem ativa o tema do Plymouth
+--no-gdm        não ativa o tema Lyra Enterprise na tela de login do GDM
 --uninstall     remove os arquivos e restaura as preferências
 --help          mostra a ajuda
 ```
@@ -82,6 +87,9 @@ curl --proto '=https' --tlsv1.2 -fsSL \
 - openSUSE, com `zypper`
 - `curl`, `tar`, `xz`, `sassc`, Node.js, `rsvg-convert` e ImageMagick 7 com
   suporte a JXL
+- `dconf` (já instalado em qualquer sistema GNOME) para o tema do GDM
+- `gnome-shell-extension-user-theme` para as cores do Shell no GDM (sem ela,
+  o GDM recebe ícones e wallpaper, mas mantém as cores padrão do Shell)
 
 O instalador resolve esses pacotes automaticamente via `zypper`.
 
@@ -107,9 +115,10 @@ tarball do GitHub), use:
 ```
 
 Aceita as mesmas opções do `install.sh` (`--dark`, `--light`,
-`--no-activate`, `--no-grub`, `--no-plymouth`, `--uninstall`), mas não instala
-dependências de build automaticamente — instale `sassc`, Node.js e
-`rsvg-convert` e ImageMagick antes de executá-lo.
+`--no-activate`, `--no-grub`, `--no-plymouth`, `--no-gdm`, `--uninstall`), mas
+não instala dependências de build automaticamente — instale `sassc`, Node.js,
+`rsvg-convert` e ImageMagick antes de executá-lo. Para as cores do Shell no
+GDM, instale também `gnome-shell-extension-user-theme`.
 
 ## Instalação manual
 
@@ -180,6 +189,41 @@ manualmente:
 sudo plymouth-set-default-theme -R Lyra-Enterprise
 ```
 
+### GDM
+
+O instalador ativa o tema na tela de login criando um perfil `gdm` no
+`dconf` (`/etc/dconf/profile/gdm`, só se ainda não existir) e um arquivo de
+banco de dados em `/etc/dconf/db/gdm.d/00-lyra-enterprise` com o ícone, o
+wallpaper e a extensão `user-theme` apontando para o tema Lyra Enterprise
+(ou `Lyra-Enterprise-Light`, na variante clara), seguido de `dconf update`.
+Requer o pacote `gnome-shell-extension-user-theme` para que as cores do Shell
+sejam aplicadas; sem ele, o GDM ainda recebe os ícones e o wallpaper Lyra,
+mas mantém as cores padrão do Shell. Para ativar manualmente:
+
+```bash
+sudo tee /etc/dconf/db/gdm.d/00-lyra-enterprise >/dev/null <<'EOF'
+[org/gnome/desktop/interface]
+icon-theme='Lyra-Enterprise-Icons'
+color-scheme='prefer-dark'
+
+[org/gnome/desktop/background]
+picture-uri='file:///usr/share/backgrounds/lyra/enterprise-light.png'
+picture-uri-dark='file:///usr/share/backgrounds/lyra/enterprise.png'
+picture-options='zoom'
+
+[org/gnome/shell]
+enabled-extensions=['user-theme@gnome-shell-extensions.gcampax.github.com']
+
+[org/gnome/shell/extensions/user-theme]
+name='Lyra-Enterprise'
+EOF
+sudo dconf update
+```
+
+Na desinstalação, o instalador remove `/etc/dconf/db/gdm.d/00-lyra-enterprise`
+e também `/etc/dconf/profile/gdm` — mas só se o perfil não existia antes da
+instalação.
+
 ### neofetch
 
 O config em `src/neofetch/config.conf` (copiado para
@@ -221,9 +265,9 @@ rpmbuild -bb packaging/lyra-enterprise-theme.spec
 rpmbuild -bb packaging/lyra-enterprise-icons.spec
 ```
 
-O pacote ativa os temas do GRUB e do Plymouth e instala os ícones e wallpapers
-como padrões do GNOME. Perfis existentes que já tenham preferências próprias
-não são sobrescritos pelo RPM. Os configs do Fastfetch e Neofetch são
+O pacote ativa os temas do GRUB, do Plymouth e do GDM, e instala os ícones e
+wallpapers como padrões do GNOME. Perfis existentes que já tenham preferências
+próprias não são sobrescritos pelo RPM. Os configs do Fastfetch e Neofetch são
 instalados em `/etc/skel` para novos usuários e como referências em
 `/usr/share/lyra-enterprise-theme/`. Use o `install-rpm.sh` acima para aplicar
 todas essas configurações também ao usuário atual.
@@ -255,5 +299,7 @@ curl --proto '=https' --tlsv1.2 -fsSL \
 
 O projeto é distribuído sob GPL-3.0-or-later. O componente GTK 3 mantém
 LGPL-2.1-or-later e a atribuição ao adw-gtk3 em
-`src/gtk3/ATTRIBUTION.md`. O tema não substitui fontes, não modifica GDM e não
-altera configurações do usuário durante a instalação por pacote.
+`src/gtk3/ATTRIBUTION.md`. O tema não substitui fontes e não altera
+configurações do usuário durante a instalação por pacote; o GDM é ajustado
+apenas via `dconf` (perfil `gdm`), sem tocar nas preferências do usuário
+logado.

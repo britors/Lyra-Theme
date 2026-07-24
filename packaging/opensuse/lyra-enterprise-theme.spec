@@ -24,14 +24,18 @@ Requires(post): grub2
 Requires(preun): grub2
 Requires(post): plymouth-scripts
 Requires(preun): plymouth-scripts
+Requires(post): dconf
+Requires(preun): dconf
 Recommends:     fastfetch
+Recommends:     gnome-shell-extension-user-theme
 Suggests:       neofetch
 
 %description
 Corporate, flat GNOME 48+ theme with dark and light variants for GNOME Shell,
-GTK 4/libadwaita and GTK 3. Includes matching PNG and JPEG XL wallpapers, the
-Lyra Enterprise boot menu theme for GRUB 2, a matching Plymouth boot splash
-theme, plus Fastfetch and Neofetch configs with a Lyra ascii logo.
+GTK 4/libadwaita and GTK 3, also themed on the GDM login screen. Includes
+matching PNG and JPEG XL wallpapers, the Lyra Enterprise boot menu theme for
+GRUB 2, a matching Plymouth boot splash theme, plus Fastfetch and Neofetch
+configs with a Lyra ascii logo.
 
 %prep
 %setup -q -c -n lyra-theme-src
@@ -99,6 +103,35 @@ if [ "$1" -eq 1 ]; then
 fi
 %{_sbindir}/plymouth-set-default-theme -R Lyra-Enterprise || :
 
+gdm_profile=%{_sysconfdir}/dconf/profile/gdm
+gdm_profile_marker=%{_localstatedir}/lib/%{name}/gdm-profile-created
+gdm_db_dir=%{_sysconfdir}/dconf/db/gdm.d
+
+if [ ! -f "$gdm_profile" ]; then
+  install -d -m 0755 "$(dirname "$gdm_profile")"
+  printf 'user-db:user\nsystem-db:gdm\n' > "$gdm_profile"
+  touch "$gdm_profile_marker"
+fi
+
+install -d -m 0755 "$gdm_db_dir"
+cat > "$gdm_db_dir/00-lyra-enterprise" <<'GDM_DCONF'
+[org/gnome/desktop/interface]
+icon-theme='Lyra-Enterprise-Icons'
+color-scheme='prefer-dark'
+
+[org/gnome/desktop/background]
+picture-uri='file:///usr/share/backgrounds/lyra/enterprise-light.png'
+picture-uri-dark='file:///usr/share/backgrounds/lyra/enterprise.png'
+picture-options='zoom'
+
+[org/gnome/shell]
+enabled-extensions=['user-theme@gnome-shell-extensions.gcampax.github.com']
+
+[org/gnome/shell/extensions/user-theme]
+name='Lyra-Enterprise'
+GDM_DCONF
+%{_bindir}/dconf update || :
+
 %preun
 if [ "$1" -eq 0 ]; then
   grub_default=%{_sysconfdir}/default/grub
@@ -122,6 +155,15 @@ if [ "$1" -eq 0 ]; then
       %{_sbindir}/plymouth-set-default-theme -R --reset || :
     fi
   fi
+
+  gdm_profile=%{_sysconfdir}/dconf/profile/gdm
+  gdm_profile_marker=%{_localstatedir}/lib/%{name}/gdm-profile-created
+
+  rm -f %{_sysconfdir}/dconf/db/gdm.d/00-lyra-enterprise
+  if [ -f "$gdm_profile_marker" ]; then
+    rm -f "$gdm_profile" "$gdm_profile_marker"
+  fi
+  %{_bindir}/dconf update || :
 
   rm -f "$grub_backup"
   rm -f "$plymouth_backup"

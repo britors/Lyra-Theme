@@ -8,20 +8,22 @@ activate=1
 uninstall=0
 grub=1
 plymouth=1
+gdm=1
 
 usage() {
   cat <<'EOF'
 Lyra Enterprise installer
 
 Usage: install.sh [--dark|--light] [--no-activate] [--no-grub]
-                   [--no-plymouth] [--uninstall]
+                   [--no-plymouth] [--no-gdm] [--uninstall]
 
   --dark          Use dark Adwaita with Lyra Enterprise icons (default)
   --light         Use light Adwaita with Lyra Enterprise icons
   --no-activate   Install files without changing GNOME, GRUB or Plymouth
-                   settings, or the neofetch config
+                   settings, the GDM login screen, or the neofetch config
   --no-grub       Skip installing and activating the GRUB theme entirely
   --no-plymouth   Skip installing and activating the Plymouth theme entirely
+  --no-gdm        Skip theming the GDM login screen entirely
   --uninstall     Remove both themes and restore GNOME defaults
 EOF
 }
@@ -33,6 +35,7 @@ while (($#)); do
     --no-activate) activate=0 ;;
     --no-grub) grub=0 ;;
     --no-plymouth) plymouth=0 ;;
+    --no-gdm) gdm=0 ;;
     --uninstall) uninstall=1 ;;
     -h|--help) usage; exit 0 ;;
     *) printf 'Unknown option: %s\n' "$1" >&2; usage >&2; exit 2 ;;
@@ -97,6 +100,13 @@ if ((uninstall)); then
     fi
     sudo rm -f /etc/plymouth/lyra-theme-backup
   fi
+  if ((activate)) && command -v dconf >/dev/null 2>&1; then
+    sudo rm -f /etc/dconf/db/gdm.d/00-lyra-enterprise
+    if [[ -f /etc/dconf/profile/gdm.lyra-theme-created ]]; then
+      sudo rm -f /etc/dconf/profile/gdm /etc/dconf/profile/gdm.lyra-theme-created
+    fi
+    sudo dconf update
+  fi
   if ((activate)); then
     if [[ -f "$HOME/.config/neofetch/config.conf.lyra-theme-backup" ]]; then
       mv "$HOME/.config/neofetch/config.conf.lyra-theme-backup" \
@@ -120,6 +130,8 @@ install_dependencies() {
   command -v zypper >/dev/null 2>&1 || die 'This installer supports openSUSE (zypper) only.'
   sudo zypper --non-interactive install \
     curl tar xz fastfetch ImageMagick nodejs rsvg-convert sassc
+  sudo zypper --non-interactive install gnome-shell-extension-user-theme 2>/dev/null || \
+    say 'gnome-shell-extension-user-theme not available; GDM will keep default Shell colors'
 }
 
 install_dependencies
@@ -233,6 +245,42 @@ if ((activate)) && ((plymouth)); then
     sudo plymouth-set-default-theme -R Lyra-Enterprise
   else
     say 'plymouth-set-default-theme not found; Plymouth theme was installed but not activated'
+  fi
+fi
+
+if ((activate)) && ((gdm)); then
+  if command -v dconf >/dev/null 2>&1; then
+    say 'Activating Lyra Enterprise for GDM'
+    shell_theme=Lyra-Enterprise
+    scheme=prefer-dark
+    if [[ $variant == light ]]; then
+      shell_theme=Lyra-Enterprise-Light
+      scheme=prefer-light
+    fi
+    if [[ ! -f /etc/dconf/profile/gdm ]]; then
+      printf 'user-db:user\nsystem-db:gdm\n' | sudo tee /etc/dconf/profile/gdm >/dev/null
+      sudo touch /etc/dconf/profile/gdm.lyra-theme-created
+    fi
+    sudo install -d /etc/dconf/db/gdm.d
+    sudo tee /etc/dconf/db/gdm.d/00-lyra-enterprise >/dev/null <<EOF
+[org/gnome/desktop/interface]
+icon-theme='Lyra-Enterprise-Icons'
+color-scheme='$scheme'
+
+[org/gnome/desktop/background]
+picture-uri='file:///usr/share/backgrounds/lyra/enterprise-light.png'
+picture-uri-dark='file:///usr/share/backgrounds/lyra/enterprise.png'
+picture-options='zoom'
+
+[org/gnome/shell]
+enabled-extensions=['user-theme@gnome-shell-extensions.gcampax.github.com']
+
+[org/gnome/shell/extensions/user-theme]
+name='$shell_theme'
+EOF
+    sudo dconf update
+  else
+    say 'dconf not found; GDM theme was not activated'
   fi
 fi
 

@@ -123,4 +123,36 @@ if command -v plymouth-set-default-theme >/dev/null 2>&1; then
   sudo plymouth-set-default-theme -R Lyra-Enterprise
 fi
 
+if command -v dconf >/dev/null 2>&1; then
+  say 'Confirming the Lyra GDM theme'
+  shell_theme=Lyra-Enterprise
+  scheme=prefer-dark
+  if [[ $variant == light ]]; then
+    shell_theme=Lyra-Enterprise-Light
+    scheme=prefer-light
+  fi
+  if [[ ! -f /etc/dconf/profile/gdm ]]; then
+    printf 'user-db:user\nsystem-db:gdm\n' | sudo tee /etc/dconf/profile/gdm >/dev/null
+    sudo touch /etc/dconf/profile/gdm.lyra-theme-created
+  fi
+  sudo install -d /etc/dconf/db/gdm.d
+  sudo tee /etc/dconf/db/gdm.d/00-lyra-enterprise >/dev/null <<EOF
+[org/gnome/desktop/interface]
+icon-theme='Lyra-Enterprise-Icons'
+color-scheme='$scheme'
+
+[org/gnome/desktop/background]
+picture-uri='file:///usr/share/backgrounds/lyra/enterprise-light.png'
+picture-uri-dark='file:///usr/share/backgrounds/lyra/enterprise.png'
+picture-options='zoom'
+
+[org/gnome/shell]
+enabled-extensions=['user-theme@gnome-shell-extensions.gcampax.github.com']
+
+[org/gnome/shell/extensions/user-theme]
+name='$shell_theme'
+EOF
+  sudo dconf update
+fi
+
 say 'Lyra Enterprise is installed and active'

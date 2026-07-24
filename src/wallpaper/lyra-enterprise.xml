@@ -2,7 +2,7 @@
 <!DOCTYPE wallpapers SYSTEM "gnome-wp-list.dtd">
 <wallpapers>
   <wallpaper deleted="false">
-    <name>Lyra Enterprise</name>
+    <name>Lyra Linux</name>
     <filename>/usr/share/backgrounds/lyra/enterprise-light.png</filename>
     <filename-dark>/usr/share/backgrounds/lyra/enterprise.png</filename-dark>
     <options>zoom</options>

@@ -1,6 +1,6 @@
 [Icon Theme]
-Name=Lyra Enterprise Icons
-Comment=Flat sapphire icon theme for Lyra Enterprise
+Name=Lyra Linux Icons
+Comment=Flat sapphire icon theme for Lyra Linux
 Inherits=Adwaita,hicolor
 Directories=scalable/places,scalable/devices,scalable/apps,scalable/status
 
