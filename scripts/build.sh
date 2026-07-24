@@ -72,7 +72,7 @@ for variant in Lyra-Enterprise Lyra-Enterprise-Light; do
 done
 mkdir -p "$dist/backgrounds" "$dist/gnome-background-properties"
 mkdir -p "$dist/grub/Lyra-Enterprise"
-mkdir -p "$dist/neofetch"
+mkdir -p "$dist/neofetch" "$dist/fastfetch"
 
 compile_scss "$root/src/shell/_tokens-dark.scss" "$root/src/shell/gnome-shell.scss" \
   "$dist/Lyra-Enterprise/gnome-shell/gnome-shell.css"
@@ -83,6 +83,8 @@ cp "$root/src/gtk4/gtk-light.css" "$dist/Lyra-Enterprise-Light/gtk-4.0/gtk.css"
 "$root/scripts/build-gtk3.sh" "$dist"
 "$root/scripts/build-plymouth.sh" "$dist"
 cp "$root/src/neofetch/config.conf" "$dist/neofetch/"
+cp "$root/src/fastfetch/config.jsonc" "$root/src/fastfetch/logo.txt" \
+  "$dist/fastfetch/"
 
 render_wallpaper "$root/src/shell/_tokens-dark.scss" enterprise
 render_wallpaper "$root/src/shell/_tokens-light.scss" enterprise-light

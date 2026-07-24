@@ -15,14 +15,14 @@ Requires(post): grub2
 Requires(preun): grub2
 Requires(post): plymouth-scripts
 Requires(preun): plymouth-scripts
-Recommends:     neofetch
+Recommends:     fastfetch
+Suggests:       neofetch
 
 %description
 Corporate, flat GNOME 48+ theme with dark and light variants for GNOME Shell,
 GTK 4/libadwaita and GTK 3. Includes matching PNG and JPEG XL wallpapers, the
 Lyra Enterprise boot menu theme for GRUB 2, a matching Plymouth boot splash
-theme, and a neofetch config with a Lyra ascii logo (installed as a
-reference file; copy it into ~/.config/neofetch/config.conf to use it).
+theme, plus Fastfetch and Neofetch configs with a Lyra ascii logo.
 
 %prep
 %autosetup
@@ -56,9 +56,17 @@ install -d %{buildroot}%{_datadir}/%{name}/neofetch
 install -m 0644 dist/neofetch/config.conf \
   %{buildroot}%{_datadir}/%{name}/neofetch/config.conf
 
+install -d %{buildroot}%{_datadir}/%{name}/fastfetch
+install -m 0644 dist/fastfetch/config.jsonc dist/fastfetch/logo.txt \
+  %{buildroot}%{_datadir}/%{name}/fastfetch/
+
 install -d %{buildroot}%{_sysconfdir}/skel/.config/neofetch
 install -m 0644 dist/neofetch/config.conf \
   %{buildroot}%{_sysconfdir}/skel/.config/neofetch/config.conf
+
+install -d %{buildroot}%{_sysconfdir}/skel/.config/fastfetch
+install -m 0644 dist/fastfetch/config.jsonc \
+  %{buildroot}%{_sysconfdir}/skel/.config/fastfetch/config.jsonc
 
 %post
 grub_default=%{_sysconfdir}/default/grub
@@ -140,9 +148,14 @@ fi
 %dir %{_datadir}/%{name}
 %dir %{_datadir}/%{name}/neofetch
 %{_datadir}/%{name}/neofetch/config.conf
+%dir %{_datadir}/%{name}/fastfetch
+%{_datadir}/%{name}/fastfetch/config.jsonc
+%{_datadir}/%{name}/fastfetch/logo.txt
 %dir %{_sysconfdir}/skel/.config
 %dir %{_sysconfdir}/skel/.config/neofetch
 %config(noreplace) %{_sysconfdir}/skel/.config/neofetch/config.conf
+%dir %{_sysconfdir}/skel/.config/fastfetch
+%config(noreplace) %{_sysconfdir}/skel/.config/fastfetch/config.jsonc
 
 %changelog
 * Thu Jul 23 2026 Lyra OS Team <contact@lyraos.dev> - 1.4.0-1
