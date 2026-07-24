@@ -49,18 +49,21 @@ render_wallpaper() {
       -e "s/@ENT_BRAND_START@/$brand_start/g" -e "s/@ENT_BRAND_END@/$brand_end/g" \
       -e "s/@ENT_WATERMARK_OPACITY@/$watermark_opacity/g" \
       "$root/src/wallpaper/enterprise.svg" > "$dist/backgrounds/$stem.svg"
-  im -background none "$dist/backgrounds/$stem.svg" -resize 3840x2160! \
-    -strip -define png:color-type=2 "$dist/backgrounds/$stem.png"
+  svg_to_png "$dist/backgrounds/$stem.svg" "$dist/backgrounds/$stem.png" \
+    3840 2160
   im "$dist/backgrounds/$stem.png" -quality 92 "$dist/backgrounds/$stem.jxl"
 }
 
 command -v magick >/dev/null 2>&1 || { echo 'error: ImageMagick is required' >&2; exit 1; }
-# Limit the SVG policy exception to this build. All SVG inputs are trusted files
-# from this repository or deterministic derivatives generated above.
-export MAGICK_CONFIGURE_PATH="$root/config/imagemagick"
+command -v rsvg-convert >/dev/null 2>&1 || { echo 'error: rsvg-convert is required' >&2; exit 1; }
 # Exported so scripts/build-plymouth.sh (run as a separate process below) can use it too.
 im() { magick "$@"; }
-export -f im
+svg_to_png() {
+  local source=$1 output=$2 width=$3 height=$4
+  rsvg-convert --width "$width" --height "$height" \
+    --output "$output" "$source"
+}
+export -f im svg_to_png
 
 rm -rf "$dist"
 for variant in Lyra-Enterprise Lyra-Enterprise-Light; do
@@ -86,12 +89,12 @@ render_wallpaper "$root/src/shell/_tokens-light.scss" enterprise-light
 cp "$root/src/wallpaper/lyra-enterprise.xml" "$dist/gnome-background-properties/"
 
 cp "$root/src/grub/theme.txt" "$dist/grub/Lyra-Enterprise/"
-im -background none "$root/src/grub/background.svg" -resize 1920x1080! \
-  -strip -define png:color-type=2 "$dist/grub/Lyra-Enterprise/background.png"
+svg_to_png "$root/src/grub/background.svg" \
+  "$dist/grub/Lyra-Enterprise/background.png" 1920 1080
 # GRUB stretches the middle segment between the fixed left/right caps.
 for part in c e n ne nw s se sw w; do
-  im -background none "$root/src/grub/select.svg" -resize 2x2! -strip \
-    "$dist/grub/Lyra-Enterprise/select_${part}.png"
+  svg_to_png "$root/src/grub/select.svg" \
+    "$dist/grub/Lyra-Enterprise/select_${part}.png" 2 2
 done
 
 "$root/scripts/check-contrast.js"

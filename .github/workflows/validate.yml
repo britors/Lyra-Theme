@@ -5,7 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     container: opensuse/tumbleweed:latest
     steps:
-      - run: zypper --non-interactive install tar xz git sassc ImageMagick nodejs
+      - run: zypper --non-interactive install tar xz git sassc ImageMagick nodejs rsvg-convert
       - uses: actions/checkout@v4
       - run: ./scripts/build.sh
       - run: ./scripts/package.sh
@@ -13,4 +13,3 @@ jobs:
         with:
           name: Lyra-Enterprise
           path: Lyra-Enterprise.tar.xz
-

@@ -108,6 +108,7 @@ if ((uninstall)); then
 fi
 
 command -v magick >/dev/null 2>&1 || die 'ImageMagick 7 (magick) is required'
+command -v rsvg-convert >/dev/null 2>&1 || die 'rsvg-convert is required'
 
 say 'Building theme, icons, wallpapers, GRUB theme and Plymouth theme'
 "$root/scripts/build.sh"

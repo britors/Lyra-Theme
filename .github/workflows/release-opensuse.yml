@@ -20,7 +20,7 @@ jobs:
     steps:
       - name: Instalar dependências de build
         run: |
-          zypper --non-interactive install -y tar gzip git sassc ImageMagick nodejs \
+          zypper --non-interactive install -y tar gzip git sassc ImageMagick nodejs rsvg-convert \
             rpm-build rpmdevtools
 
       - uses: actions/checkout@v4

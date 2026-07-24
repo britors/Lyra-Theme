@@ -8,6 +8,7 @@ Source0:        %{name}-%{version}.tar.xz
 BuildArch:      noarch
 BuildRequires:  ImageMagick
 BuildRequires:  nodejs
+BuildRequires:  rsvg-convert
 BuildRequires:  sassc
 Requires:       lyra-enterprise-icons
 Requires(post): grub2

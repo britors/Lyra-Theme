@@ -80,7 +80,8 @@ curl --proto '=https' --tlsv1.2 -fsSL \
 
 - GNOME 48 ou superior
 - openSUSE, com `zypper`
-- `curl`, `tar`, `xz`, `sassc`, Node.js e ImageMagick 7 com suporte a JXL
+- `curl`, `tar`, `xz`, `sassc`, Node.js, `rsvg-convert` e ImageMagick 7 com
+  suporte a JXL
 
 O instalador resolve esses pacotes automaticamente via `zypper`.
 

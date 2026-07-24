@@ -17,6 +17,7 @@ Source0:        lyra-theme-src.tar.gz
 BuildArch:      noarch
 BuildRequires:  ImageMagick
 BuildRequires:  nodejs
+BuildRequires:  rsvg-convert
 BuildRequires:  sassc
 Requires:       lyra-enterprise-icons
 Requires(post): grub2
