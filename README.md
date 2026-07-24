@@ -184,8 +184,9 @@ sudo plymouth-set-default-theme -R Lyra-Enterprise
 
 O config em `src/neofetch/config.conf` (copiado para
 `~/.config/neofetch/config.conf` pelo instalador) troca o logo ascii pelo
-mark da Lyra, colorido com a paleta da marca, mantendo o resto das opções
-padrão do neofetch. Para aplicá-lo manualmente:
+mark da Lyra com a legenda `Lyra Linux 1.0 - ODISSEIA`, colorido com a
+paleta da marca, mantendo o resto das opções padrão do neofetch. Para
+aplicá-lo manualmente:
 
 ```bash
 mkdir -p ~/.config/neofetch
@@ -195,8 +196,9 @@ cp dist/neofetch/config.conf ~/.config/neofetch/config.conf
 ### Fastfetch
 
 O config em `src/fastfetch/config.jsonc` usa o logo ascii Lyra localizado em
-`/usr/share/lyra-enterprise-theme/fastfetch/logo.txt`. O instalador cria um
-backup do config atual antes de ativá-lo. Para aplicar manualmente:
+`/usr/share/lyra-enterprise-theme/fastfetch/logo.txt`, com a legenda
+`Lyra Linux 1.0 - ODISSEIA`. O instalador cria um backup do config atual
+antes de ativá-lo. Para aplicar manualmente:
 
 ```bash
 mkdir -p ~/.config/fastfetch
