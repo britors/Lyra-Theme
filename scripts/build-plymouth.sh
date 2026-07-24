@@ -15,5 +15,6 @@ svg_to_png "$root/src/plymouth/progress-track.svg" \
 svg_to_png "$root/src/plymouth/progress-fill.svg" \
   "$theme_dir/progress-fill.png" 800 20
 
-cp "$root/src/plymouth/lyra-enterprise.plymouth" "$theme_dir/"
+cp "$root/src/plymouth/lyra-enterprise.plymouth" \
+  "$theme_dir/Lyra-Enterprise.plymouth"
 cp "$root/src/plymouth/lyra-enterprise.script" "$theme_dir/"
