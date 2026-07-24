@@ -1,10 +1,9 @@
 # Empacotamento para o GitHub Actions (build direto da tag, sem depender do
 # _service do OBS) e para o gatilho do openSUSE Build Service
 # (home:rodrigosbrito:lyra/lyra-theme, ver .github/workflows/release-opensuse.yml).
-# Cópia de packaging/lyra-enterprise-theme.spec adaptada só no Source0/%setup
-# pra bater com o tarball "achatado" (sem diretório versionado) que o
-# workflow monta com tar czf, ao invés do %autosetup -n %{name}-%{version}
-# do spec original. Resto do spec é idêntico.
+# Cópia de packaging/lyra-enterprise-theme.spec adaptada apenas no Source0 e
+# na preparação das fontes para o tarball "achatado" (sem diretório
+# versionado) que o workflow monta. O restante do spec é idêntico.
 %{!?version: %define version 0.0.0}
 
 Name:           lyra-enterprise-theme
@@ -133,7 +132,7 @@ fi
 %doc README.md src/gtk3/ATTRIBUTION.md
 %{_datadir}/themes/Lyra-Enterprise/
 %{_datadir}/themes/Lyra-Enterprise-Light/
-# %dir on backgrounds/gnome-background-properties/grub/plymouth: none of
+# Explicit parent-directory entries below are required because none of
 # these come from a Requires of this package (no grub2/plymouth runtime
 # dependency, since the theme is meant to be optional on top of whatever
 # bootloader/splash the system already has), so nothing else is

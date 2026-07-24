@@ -124,7 +124,7 @@ fi
 %doc README.md src/gtk3/ATTRIBUTION.md
 %{_datadir}/themes/Lyra-Enterprise/
 %{_datadir}/themes/Lyra-Enterprise-Light/
-# %dir on backgrounds/gnome-background-properties/grub/plymouth: none of
+# Explicit parent-directory entries below are required because none of
 # these come from a Requires of this package (no grub2/plymouth runtime
 # dependency, since the theme is meant to be optional on top of whatever
 # bootloader/splash the system already has), so nothing else is
