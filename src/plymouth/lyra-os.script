@@ -1,4 +1,4 @@
-# Lyra Enterprise Plymouth boot splash.
+# Lyra OS Plymouth boot splash.
 # Mirrors the GRUB boot theme (src/grub) so GRUB and Plymouth read as one
 # continuous boot sequence: same dark background, same logo and wordmark.
 

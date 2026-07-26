@@ -50,8 +50,8 @@ say 'Refreshing and importing the repo GPG key'
 sudo zypper --gpg-auto-import-keys refresh "$repo_alias"
 
 if ((install)); then
-  say 'Installing lyra-enterprise-theme and lyra-enterprise-icons'
-  sudo zypper --non-interactive install lyra-enterprise-theme lyra-enterprise-icons
+  say 'Installing lyra-os-theme and lyra-os-icons'
+  sudo zypper --non-interactive install lyra-os-theme lyra-os-icons
 fi
 
 say 'Done'

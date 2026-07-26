@@ -1,25 +1,24 @@
-# Lyra Enterprise
+# Lyra OS
 
 Identidade visual para GNOME 48+, criada para o Lyra OS e para openSUSE. A
 configuração recomendada usa Adwaita no Shell e nos aplicativos, com ícones e
-wallpapers Lyra Enterprise.
+wallpapers Lyra OS.
 
 ## Componentes
 
 - Adwaita nativo para GNOME Shell, GTK 4/libadwaita e GTK 3
-- Tema vetorial `Lyra-Enterprise-Icons`, com fallback completo para Adwaita
+- Tema vetorial `Lyra-OS-Icons`, com fallback completo para Adwaita
 - Wallpapers dark e light em PNG e JPEG XL, 3840×2160
-- Tema do GRUB 2 com fundo Full HD e menu de boot Lyra Enterprise
+- Tema do GRUB 2 com fundo Full HD e menu de boot Lyra OS
 - Tema de boot do Plymouth com o mesmo fundo e logo do GRUB
-- Tela de login do GDM com ícones, wallpaper e cores do GNOME Shell Lyra
-  Enterprise
+- Tela de login do GDM com ícones, wallpaper e cores do GNOME Shell Lyra OS
 - Configs do Fastfetch e Neofetch com logo ascii da Lyra e cores da marca
 - Pacotes RPM para openSUSE
 
 ## Instalação rápida
 
 Revise o [install.sh](install.sh) antes de executá-lo. Requer openSUSE
-(`zypper`). Para usar Adwaita escuro com ícones e wallpaper Lyra Enterprise:
+(`zypper`). Para usar Adwaita escuro com ícones e wallpaper Lyra OS:
 
 ```bash
 curl --proto '=https' --tlsv1.2 -fsSL \
@@ -53,8 +52,8 @@ curl --proto '=https' --tlsv1.2 -fsSL \
 
 O instalador instala as dependências via `zypper`, compila os arquivos,
 instala tema, ícones, wallpapers, GRUB, Plymouth e a tela de login do GDM,
-ativa Adwaita com os ícones Lyra Enterprise no GNOME, o menu de boot do GRUB,
-o splash de boot do Plymouth e o tema Lyra Enterprise no GDM (ícones,
+ativa Adwaita com os ícones Lyra OS no GNOME, o menu de boot do GRUB,
+o splash de boot do Plymouth e o tema Lyra OS no GDM (ícones,
 wallpaper e cores do Shell), e copia os configs do Fastfetch e Neofetch com o
 logo ascii da Lyra para o perfil atual. Configurações existentes recebem um
 backup antes da substituição. A senha administrativa é solicitada diretamente
@@ -69,7 +68,7 @@ pelo terminal.
                 Plymouth, do GDM ou os configs do Fastfetch e Neofetch
 --no-grub       não instala nem ativa o tema do GRUB
 --no-plymouth   não instala nem ativa o tema do Plymouth
---no-gdm        não ativa o tema Lyra Enterprise na tela de login do GDM
+--no-gdm        não ativa o tema Lyra OS na tela de login do GDM
 --uninstall     remove os arquivos e restaura as preferências
 --help          mostra a ajuda
 ```
@@ -104,7 +103,7 @@ cd Lyra-Theme
 ```
 
 Os resultados são gravados em `dist/`. O último comando também gera
-`Lyra-Enterprise.tar.xz`. O build executa automaticamente a validação WCAG das
+`Lyra-OS.tar.xz`. O build executa automaticamente a validação WCAG das
 paletas dark e light.
 
 Para compilar e instalar diretamente a partir deste checkout (sem baixar um
@@ -126,15 +125,15 @@ componentes habilitados.
 sudo install -d /usr/share/themes /usr/share/icons \
   /usr/share/backgrounds/lyra /usr/share/gnome-background-properties \
   /usr/share/grub/themes /usr/share/plymouth/themes \
-  /usr/share/lyra-enterprise-theme/fastfetch
-sudo cp -a dist/Lyra-Enterprise dist/Lyra-Enterprise-Light /usr/share/themes/
-sudo cp -a dist/Lyra-Enterprise-Icons /usr/share/icons/
+  /usr/share/lyra-os-theme/fastfetch
+sudo cp -a dist/Lyra-OS dist/Lyra-OS-Light /usr/share/themes/
+sudo cp -a dist/Lyra-OS-Icons /usr/share/icons/
 sudo install -m 0644 dist/backgrounds/*.{png,jxl} /usr/share/backgrounds/lyra/
-sudo install -m 0644 dist/gnome-background-properties/lyra-enterprise.xml \
+sudo install -m 0644 dist/gnome-background-properties/lyra-os.xml \
   /usr/share/gnome-background-properties/
-sudo cp -a dist/grub/Lyra-Enterprise /usr/share/grub/themes/
-sudo cp -a dist/plymouth/Lyra-Enterprise /usr/share/plymouth/themes/
-sudo cp -a dist/fastfetch/. /usr/share/lyra-enterprise-theme/fastfetch/
+sudo cp -a dist/grub/Lyra-OS /usr/share/grub/themes/
+sudo cp -a dist/plymouth/Lyra-OS /usr/share/plymouth/themes/
+sudo cp -a dist/fastfetch/. /usr/share/lyra-os-theme/fastfetch/
 mkdir -p ~/.config/neofetch
 cp dist/neofetch/config.conf ~/.config/neofetch/config.conf
 mkdir -p ~/.config/fastfetch
@@ -143,18 +142,18 @@ cp dist/fastfetch/config.jsonc ~/.config/fastfetch/config.jsonc
 
 ## Ativação manual
 
-### Adwaita com ícones Lyra Enterprise
+### Adwaita com ícones Lyra OS
 
 ```bash
 gsettings reset org.gnome.shell.extensions.user-theme name
 gsettings reset org.gnome.desktop.interface gtk-theme
-gsettings set org.gnome.desktop.interface icon-theme 'Lyra-Enterprise-Icons'
+gsettings set org.gnome.desktop.interface icon-theme 'Lyra-OS-Icons'
 gsettings set org.gnome.desktop.interface accent-color 'blue'
 gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
 ```
 
 O GNOME Shell e os aplicativos permanecem no Adwaita padrão; somente os ícones
-são fornecidos pelo Lyra Enterprise. Isso mantém compatibilidade integral com
+são fornecidos pelo Lyra OS. Isso mantém compatibilidade integral com
 os controles rápidos das versões atuais do GNOME.
 
 ### Variante clara
@@ -171,7 +170,7 @@ O instalador ativa o tema em `/etc/default/grub` e regenera o `grub.cfg` com
 `grub2-mkconfig`. Para ativá-lo manualmente, acrescente:
 
 ```bash
-GRUB_THEME="/usr/share/grub/themes/Lyra-Enterprise/theme.txt"
+GRUB_THEME="/usr/share/grub/themes/Lyra-OS/theme.txt"
 ```
 
 Depois execute `sudo grub2-mkconfig -o /boot/grub2/grub.cfg`. O instalador só
@@ -180,47 +179,47 @@ Lyra.
 
 ### Plymouth
 
-O instalador ativa o tema com `plymouth-set-default-theme -R Lyra-Enterprise`
+O instalador ativa o tema com `plymouth-set-default-theme -R Lyra-OS`
 (o `-R` já regenera o initramfs) quando esse comando está disponível, e
 guarda o tema anterior para restaurá-lo na desinstalação. Para ativar
 manualmente:
 
 ```bash
-sudo plymouth-set-default-theme -R Lyra-Enterprise
+sudo plymouth-set-default-theme -R Lyra-OS
 ```
 
 ### GDM
 
 O instalador ativa o tema na tela de login criando um perfil `gdm` no
 `dconf` (`/etc/dconf/profile/gdm`, só se ainda não existir) e um arquivo de
-banco de dados em `/etc/dconf/db/gdm.d/00-lyra-enterprise` com o ícone, o
-wallpaper e a extensão `user-theme` apontando para o tema Lyra Enterprise
-(ou `Lyra-Enterprise-Light`, na variante clara), seguido de `dconf update`.
+banco de dados em `/etc/dconf/db/gdm.d/00-lyra-os` com o ícone, o
+wallpaper e a extensão `user-theme` apontando para o tema Lyra OS
+(ou `Lyra-OS-Light`, na variante clara), seguido de `dconf update`.
 Requer o pacote `gnome-shell-extension-user-theme` para que as cores do Shell
 sejam aplicadas; sem ele, o GDM ainda recebe os ícones e o wallpaper Lyra,
 mas mantém as cores padrão do Shell. Para ativar manualmente:
 
 ```bash
-sudo tee /etc/dconf/db/gdm.d/00-lyra-enterprise >/dev/null <<'EOF'
+sudo tee /etc/dconf/db/gdm.d/00-lyra-os >/dev/null <<'EOF'
 [org/gnome/desktop/interface]
-icon-theme='Lyra-Enterprise-Icons'
+icon-theme='Lyra-OS-Icons'
 color-scheme='prefer-dark'
 
 [org/gnome/desktop/background]
-picture-uri='file:///usr/share/backgrounds/lyra/enterprise-light.png'
-picture-uri-dark='file:///usr/share/backgrounds/lyra/enterprise.png'
+picture-uri='file:///usr/share/backgrounds/lyra/os-light.png'
+picture-uri-dark='file:///usr/share/backgrounds/lyra/os.png'
 picture-options='zoom'
 
 [org/gnome/shell]
 enabled-extensions=['user-theme@gnome-shell-extensions.gcampax.github.com']
 
 [org/gnome/shell/extensions/user-theme]
-name='Lyra-Enterprise'
+name='Lyra-OS'
 EOF
 sudo dconf update
 ```
 
-Na desinstalação, o instalador remove `/etc/dconf/db/gdm.d/00-lyra-enterprise`
+Na desinstalação, o instalador remove `/etc/dconf/db/gdm.d/00-lyra-os`
 e também `/etc/dconf/profile/gdm` — mas só se o perfil não existia antes da
 instalação.
 
@@ -228,7 +227,7 @@ instalação.
 
 O config em `src/neofetch/config.conf` (copiado para
 `~/.config/neofetch/config.conf` pelo instalador) troca o logo ascii pelo
-mark da Lyra com a legenda `Lyra Linux 1.0 - ODISSEIA`, colorido com a
+mark da Lyra com a legenda `Lyra OS 1.0 - ODISSEIA`, colorido com a
 paleta da marca, mantendo o resto das opções padrão do neofetch. Para
 aplicá-lo manualmente:
 
@@ -240,8 +239,8 @@ cp dist/neofetch/config.conf ~/.config/neofetch/config.conf
 ### Fastfetch
 
 O config em `src/fastfetch/config.jsonc` usa o logo ascii Lyra localizado em
-`/usr/share/lyra-enterprise-theme/fastfetch/logo.txt`, com a legenda
-`Lyra Linux 1.0 - ODISSEIA`. O instalador cria um backup do config atual
+`/usr/share/lyra-os-theme/fastfetch/logo.txt`, com a legenda
+`Lyra OS 1.0 - ODISSEIA`. O instalador cria um backup do config atual
 antes de ativá-lo. Para aplicar manualmente:
 
 ```bash
@@ -255,21 +254,21 @@ cp dist/fastfetch/config.jsonc ~/.config/fastfetch/config.jsonc
 
 As especificações estão em:
 
-- `packaging/lyra-enterprise-theme.spec`
-- `packaging/lyra-enterprise-icons.spec`
+- `packaging/lyra-os-theme.spec`
+- `packaging/lyra-os-icons.spec`
 
 Exemplo de build no ambiente padrão do RPM:
 
 ```bash
-rpmbuild -bb packaging/lyra-enterprise-theme.spec
-rpmbuild -bb packaging/lyra-enterprise-icons.spec
+rpmbuild -bb packaging/lyra-os-theme.spec
+rpmbuild -bb packaging/lyra-os-icons.spec
 ```
 
 O pacote ativa os temas do GRUB, do Plymouth e do GDM, e instala os ícones e
 wallpapers como padrões do GNOME. Perfis existentes que já tenham preferências
 próprias não são sobrescritos pelo RPM. Os configs do Fastfetch e Neofetch são
 instalados em `/etc/skel` para novos usuários e como referências em
-`/usr/share/lyra-enterprise-theme/`. Use o `install-rpm.sh` acima para aplicar
+`/usr/share/lyra-os-theme/`. Use o `install-rpm.sh` acima para aplicar
 todas essas configurações também ao usuário atual.
 
 ## Estrutura

@@ -21,10 +21,10 @@ compile() {
   fi
 }
 
-mkdir -p "$dist/Lyra-Enterprise/gtk-3.0" "$dist/Lyra-Enterprise-Light/gtk-3.0"
-compile "$root/src/gtk3/_colors-dark.scss" "$dist/Lyra-Enterprise/gtk-3.0/gtk.css"
-compile "$root/src/gtk3/_colors-light.scss" "$dist/Lyra-Enterprise-Light/gtk-3.0/gtk.css"
-for variant in Lyra-Enterprise Lyra-Enterprise-Light; do
+mkdir -p "$dist/Lyra-OS/gtk-3.0" "$dist/Lyra-OS-Light/gtk-3.0"
+compile "$root/src/gtk3/_colors-dark.scss" "$dist/Lyra-OS/gtk-3.0/gtk.css"
+compile "$root/src/gtk3/_colors-light.scss" "$dist/Lyra-OS-Light/gtk-3.0/gtk.css"
+for variant in Lyra-OS Lyra-OS-Light; do
   cp "$root/src/gtk3/ATTRIBUTION.md" "$dist/$variant/gtk-3.0/"
   cp "$root/src/gtk3/COPYING.LGPL" "$dist/$variant/gtk-3.0/"
 done
