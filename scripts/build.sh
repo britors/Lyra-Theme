@@ -3,8 +3,11 @@ set -euo pipefail
 
 root=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 dist="$root/dist"
-tmp=$(mktemp -d)
+tmp=$(mktemp -d "$root/.build-tmp.XXXXXX")
 trap 'rm -rf "$tmp"' EXIT
+# Keep ImageMagick's pixel cache with the build's temporary files instead of
+# relying on the system /tmp filesystem, which may be space-constrained.
+export MAGICK_TEMPORARY_PATH="$tmp"
 
 compile_scss() {
   local tokens=$1 source=$2 output=$3
