@@ -227,7 +227,7 @@ instalação.
 
 O config em `src/neofetch/config.conf` (copiado para
 `~/.config/neofetch/config.conf` pelo instalador) troca o logo ascii pelo
-mark da Lyra com a legenda `Lyra OS 1.0 - ODISSEIA`, colorido com a
+mark da Lyra e exibe o nome e a versão de `/etc/os-release`, colorido com a
 paleta da marca, mantendo o resto das opções padrão do neofetch. Para
 aplicá-lo manualmente:
 
@@ -239,8 +239,8 @@ cp dist/neofetch/config.conf ~/.config/neofetch/config.conf
 ### Fastfetch
 
 O config em `src/fastfetch/config.jsonc` usa o logo ascii Lyra localizado em
-`/usr/share/lyra-os-theme/fastfetch/logo.txt`, com a legenda
-`Lyra OS 1.0 - ODISSEIA`. O instalador cria um backup do config atual
+`/usr/share/lyra-os-theme/fastfetch/logo.txt` e exibe o nome e a versão de
+`/etc/os-release`. O instalador cria um backup do config atual
 antes de ativá-lo. Para aplicar manualmente:
 
 ```bash
