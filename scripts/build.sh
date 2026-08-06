@@ -3,8 +3,11 @@ set -euo pipefail
 
 root=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 dist="$root/dist"
-tmp=$(mktemp -d)
+tmp=$(mktemp -d "$root/.build-tmp.XXXXXX")
 trap 'rm -rf "$tmp"' EXIT
+# Keep ImageMagick's pixel cache with the build's temporary files instead of
+# relying on the system /tmp filesystem, which may be space-constrained.
+export MAGICK_TEMPORARY_PATH="$tmp"
 
 compile_scss() {
   local tokens=$1 source=$2 output=$3
@@ -48,7 +51,7 @@ render_wallpaper() {
       -e "s/@ENT_BORDER@/$border/g" -e "s/@ENT_TEXT@/$text/g" \
       -e "s/@ENT_BRAND_START@/$brand_start/g" -e "s/@ENT_BRAND_END@/$brand_end/g" \
       -e "s/@ENT_WATERMARK_OPACITY@/$watermark_opacity/g" \
-      "$root/src/wallpaper/enterprise.svg" > "$dist/backgrounds/$stem.svg"
+      "$root/src/wallpaper/os.svg" > "$dist/backgrounds/$stem.svg"
   svg_to_png "$dist/backgrounds/$stem.svg" "$dist/backgrounds/$stem.png" \
     3840 2160
   im "$dist/backgrounds/$stem.png" -quality 92 "$dist/backgrounds/$stem.jxl"
@@ -66,38 +69,38 @@ svg_to_png() {
 export -f im svg_to_png
 
 rm -rf "$dist"
-for variant in Lyra-Enterprise Lyra-Enterprise-Light; do
+for variant in Lyra-OS Lyra-OS-Light; do
   mkdir -p "$dist/$variant/gnome-shell" "$dist/$variant/gtk-4.0" \
     "$dist/$variant/gtk-3.0"
 done
 mkdir -p "$dist/backgrounds" "$dist/gnome-background-properties"
-mkdir -p "$dist/grub/Lyra-Enterprise"
+mkdir -p "$dist/grub/Lyra-OS"
 mkdir -p "$dist/neofetch" "$dist/fastfetch"
 
 compile_scss "$root/src/shell/_tokens-dark.scss" "$root/src/shell/gnome-shell.scss" \
-  "$dist/Lyra-Enterprise/gnome-shell/gnome-shell.css"
+  "$dist/Lyra-OS/gnome-shell/gnome-shell.css"
 compile_scss "$root/src/shell/_tokens-light.scss" "$root/src/shell/gnome-shell.scss" \
-  "$dist/Lyra-Enterprise-Light/gnome-shell/gnome-shell.css"
-cp "$root/src/gtk4/gtk-dark.css" "$dist/Lyra-Enterprise/gtk-4.0/gtk.css"
-cp "$root/src/gtk4/gtk-light.css" "$dist/Lyra-Enterprise-Light/gtk-4.0/gtk.css"
+  "$dist/Lyra-OS-Light/gnome-shell/gnome-shell.css"
+cp "$root/src/gtk4/gtk-dark.css" "$dist/Lyra-OS/gtk-4.0/gtk.css"
+cp "$root/src/gtk4/gtk-light.css" "$dist/Lyra-OS-Light/gtk-4.0/gtk.css"
 "$root/scripts/build-gtk3.sh" "$dist"
 "$root/scripts/build-plymouth.sh" "$dist"
 cp "$root/src/neofetch/config.conf" "$dist/neofetch/"
 cp "$root/src/fastfetch/config.jsonc" "$root/src/fastfetch/logo.txt" \
   "$dist/fastfetch/"
 
-render_wallpaper "$root/src/shell/_tokens-dark.scss" enterprise
-render_wallpaper "$root/src/shell/_tokens-light.scss" enterprise-light
-cp "$root/src/wallpaper/lyra-enterprise.xml" "$dist/gnome-background-properties/"
+render_wallpaper "$root/src/shell/_tokens-dark.scss" os
+render_wallpaper "$root/src/shell/_tokens-light.scss" os-light
+cp "$root/src/wallpaper/lyra-os.xml" "$dist/gnome-background-properties/"
 
-cp "$root/src/grub/theme.txt" "$dist/grub/Lyra-Enterprise/"
+cp "$root/src/grub/theme.txt" "$dist/grub/Lyra-OS/"
 svg_to_png "$root/src/grub/background.svg" \
-  "$dist/grub/Lyra-Enterprise/background.png" 1920 1080
+  "$dist/grub/Lyra-OS/background.png" 1920 1080
 # GRUB stretches the middle segment between the fixed left/right caps.
 for part in c e n ne nw s se sw w; do
   svg_to_png "$root/src/grub/select.svg" \
-    "$dist/grub/Lyra-Enterprise/select_${part}.png" 2 2
+    "$dist/grub/Lyra-OS/select_${part}.png" 2 2
 done
 
 "$root/scripts/check-contrast.js"
-printf 'Built Lyra Enterprise in %s\n' "$dist"
+printf 'Built Lyra OS in %s\n' "$dist"

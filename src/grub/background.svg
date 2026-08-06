@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
-  <title>Lyra Enterprise GRUB</title>
+  <title>Lyra OS GRUB</title>
   <rect width="1920" height="1080" fill="#0b1018"/>
   <path d="M0 0h610L398 212H0zm1920 1080h-630l215-215h415z" fill="#111925"/>
   <g fill="none" stroke="#26364c" opacity=".58">
@@ -15,5 +15,5 @@
     <path d="M0 22h160M0 52h160M80 140v30M50 170h60"/>
   </g>
   <text x="960" y="105" fill="#e7edf6" font-family="DejaVu Sans, sans-serif" font-size="24" text-anchor="middle" letter-spacing="5">LYRA OS</text>
-  <text x="960" y="920" fill="#8391a5" font-family="DejaVu Sans, sans-serif" font-size="16" text-anchor="middle">Enterprise boot environment</text>
+  <text x="960" y="920" fill="#8391a5" font-family="DejaVu Sans, sans-serif" font-size="16" text-anchor="middle">Lyra OS boot environment</text>
 </svg>

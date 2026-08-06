@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=Lyra OS
+Description=Corporate boot splash for Lyra OS, matching the GRUB boot theme
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/Lyra-OS
+ScriptFile=/usr/share/plymouth/themes/Lyra-OS/lyra-os.script

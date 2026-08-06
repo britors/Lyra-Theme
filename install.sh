@@ -8,20 +8,22 @@ activate=1
 uninstall=0
 grub=1
 plymouth=1
+gdm=1
 
 usage() {
   cat <<'EOF'
-Lyra Enterprise installer
+Lyra OS installer
 
 Usage: install.sh [--dark|--light] [--no-activate] [--no-grub]
-                   [--no-plymouth] [--uninstall]
+                   [--no-plymouth] [--no-gdm] [--uninstall]
 
-  --dark          Use dark Adwaita with Lyra Enterprise icons (default)
-  --light         Use light Adwaita with Lyra Enterprise icons
+  --dark          Use dark Adwaita with Lyra OS icons (default)
+  --light         Use light Adwaita with Lyra OS icons
   --no-activate   Install files without changing GNOME, GRUB or Plymouth
-                   settings, or the neofetch config
+                   settings, the GDM login screen, or the neofetch config
   --no-grub       Skip installing and activating the GRUB theme entirely
   --no-plymouth   Skip installing and activating the Plymouth theme entirely
+  --no-gdm        Skip theming the GDM login screen entirely
   --uninstall     Remove both themes and restore GNOME defaults
 EOF
 }
@@ -33,6 +35,7 @@ while (($#)); do
     --no-activate) activate=0 ;;
     --no-grub) grub=0 ;;
     --no-plymouth) plymouth=0 ;;
+    --no-gdm) gdm=0 ;;
     --uninstall) uninstall=1 ;;
     -h|--help) usage; exit 0 ;;
     *) printf 'Unknown option: %s\n' "$1" >&2; usage >&2; exit 2 ;;
@@ -61,28 +64,28 @@ if ! sudo -n true 2>/dev/null; then
 fi
 
 if ((uninstall)); then
-  say 'Removing Lyra Enterprise'
-  sudo rm -rf /usr/share/themes/Lyra-Enterprise \
-    /usr/share/themes/Lyra-Enterprise-Light \
-    /usr/share/icons/Lyra-Enterprise-Icons \
-    /usr/share/grub/themes/Lyra-Enterprise \
-    /usr/share/plymouth/themes/Lyra-Enterprise \
-    /usr/share/lyra-enterprise-theme
-  sudo rm -f /usr/share/backgrounds/lyra/enterprise.png \
-    /usr/share/backgrounds/lyra/enterprise-light.png \
-    /usr/share/backgrounds/lyra/enterprise.jxl \
-    /usr/share/backgrounds/lyra/enterprise-light.jxl \
-    /usr/share/gnome-background-properties/lyra-enterprise.xml
+  say 'Removing Lyra OS'
+  sudo rm -rf /usr/share/themes/Lyra-OS \
+    /usr/share/themes/Lyra-OS-Light \
+    /usr/share/icons/Lyra-OS-Icons \
+    /usr/share/grub/themes/Lyra-OS \
+    /usr/share/plymouth/themes/Lyra-OS \
+    /usr/share/lyra-os-theme
+  sudo rm -f /usr/share/backgrounds/lyra/os.png \
+    /usr/share/backgrounds/lyra/os-light.png \
+    /usr/share/backgrounds/lyra/os.jxl \
+    /usr/share/backgrounds/lyra/os-light.jxl \
+    /usr/share/gnome-background-properties/lyra-os.xml
   if ((activate)) && command -v gsettings >/dev/null 2>&1; then
-    [[ $(readlink "$HOME/.config/gtk-4.0/gtk.css" 2>/dev/null || true) == /usr/share/themes/Lyra-Enterprise* ]] && rm -f "$HOME/.config/gtk-4.0/gtk.css"
+    [[ $(readlink "$HOME/.config/gtk-4.0/gtk.css" 2>/dev/null || true) == /usr/share/themes/Lyra-OS* ]] && rm -f "$HOME/.config/gtk-4.0/gtk.css"
     gsettings reset org.gnome.shell.extensions.user-theme name 2>/dev/null || true
     gsettings reset org.gnome.desktop.interface gtk-theme 2>/dev/null || true
     gsettings reset org.gnome.desktop.interface icon-theme 2>/dev/null || true
     gsettings reset org.gnome.desktop.interface color-scheme 2>/dev/null || true
   fi
   if ((activate)) && [[ -f /etc/default/grub ]] && \
-      sudo grep -qx 'GRUB_THEME="/usr/share/grub/themes/Lyra-Enterprise/theme.txt"' /etc/default/grub; then
-    sudo sed -i '\|^GRUB_THEME="/usr/share/grub/themes/Lyra-Enterprise/theme.txt"$|d' /etc/default/grub
+      sudo grep -qx 'GRUB_THEME="/usr/share/grub/themes/Lyra-OS/theme.txt"' /etc/default/grub; then
+    sudo sed -i '\|^GRUB_THEME="/usr/share/grub/themes/Lyra-OS/theme.txt"$|d' /etc/default/grub
     if [[ -s /etc/default/grub.lyra-theme-backup ]]; then
       sudo sh -c 'cat /etc/default/grub.lyra-theme-backup >> /etc/default/grub'
     fi
@@ -96,6 +99,13 @@ if ((uninstall)); then
       sudo plymouth-set-default-theme -R details
     fi
     sudo rm -f /etc/plymouth/lyra-theme-backup
+  fi
+  if ((activate)) && command -v dconf >/dev/null 2>&1; then
+    sudo rm -f /etc/dconf/db/gdm.d/00-lyra-os
+    if [[ -f /etc/dconf/profile/gdm.lyra-theme-created ]]; then
+      sudo rm -f /etc/dconf/profile/gdm /etc/dconf/profile/gdm.lyra-theme-created
+    fi
+    sudo dconf update
   fi
   if ((activate)); then
     if [[ -f "$HOME/.config/neofetch/config.conf.lyra-theme-backup" ]]; then
@@ -118,14 +128,22 @@ fi
 install_dependencies() {
   say 'Installing build and runtime dependencies'
   command -v zypper >/dev/null 2>&1 || die 'This installer supports openSUSE (zypper) only.'
-  sudo zypper --non-interactive install \
-    curl tar xz fastfetch ImageMagick nodejs rsvg-convert sassc
+  local packages=(
+    adwaita-icon-theme curl fastfetch glib2-tools gtk3-tools gzip
+    ImageMagick nodejs rsvg-convert sassc tar xz
+  )
+  ((grub)) && packages+=(grub2)
+  ((plymouth)) && packages+=(plymouth-plugin-script plymouth-scripts)
+  ((gdm)) && packages+=(dconf gnome-shell-extension-user-theme)
+  sudo zypper --non-interactive install "${packages[@]}"
 }
 
 install_dependencies
 command -v curl >/dev/null 2>&1 || die 'curl was not installed'
 command -v magick >/dev/null 2>&1 || die 'ImageMagick 7 (magick) is required'
+command -v node >/dev/null 2>&1 || die 'Node.js is required'
 command -v rsvg-convert >/dev/null 2>&1 || die 'rsvg-convert is required'
+command -v sassc >/dev/null 2>&1 || die 'sassc is required'
 
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
@@ -144,28 +162,28 @@ say 'Building theme, icons, wallpapers, GRUB theme and Plymouth theme'
 say 'Installing system files'
 sudo install -d /usr/share/themes /usr/share/icons \
   /usr/share/backgrounds/lyra /usr/share/gnome-background-properties \
-  /usr/share/lyra-enterprise-theme/fastfetch
-sudo cp -a "$source_dir/dist/Lyra-Enterprise" \
-  "$source_dir/dist/Lyra-Enterprise-Light" /usr/share/themes/
-sudo cp -a "$source_dir/dist/Lyra-Enterprise-Icons" /usr/share/icons/
+  /usr/share/lyra-os-theme/fastfetch
+sudo cp -a "$source_dir/dist/Lyra-OS" \
+  "$source_dir/dist/Lyra-OS-Light" /usr/share/themes/
+sudo cp -a "$source_dir/dist/Lyra-OS-Icons" /usr/share/icons/
 sudo install -m 0644 "$source_dir"/dist/backgrounds/*.{png,jxl} \
   /usr/share/backgrounds/lyra/
 sudo install -m 0644 \
-  "$source_dir/dist/gnome-background-properties/lyra-enterprise.xml" \
+  "$source_dir/dist/gnome-background-properties/lyra-os.xml" \
   /usr/share/gnome-background-properties/
 sudo install -m 0644 "$source_dir/dist/fastfetch/config.jsonc" \
   "$source_dir/dist/fastfetch/logo.txt" \
-  /usr/share/lyra-enterprise-theme/fastfetch/
+  /usr/share/lyra-os-theme/fastfetch/
 if ((grub)); then
   sudo install -d /usr/share/grub/themes
-  sudo cp -a "$source_dir/dist/grub/Lyra-Enterprise" /usr/share/grub/themes/
+  sudo cp -a "$source_dir/dist/grub/Lyra-OS" /usr/share/grub/themes/
 fi
 if ((plymouth)); then
   sudo install -d /usr/share/plymouth/themes
-  sudo cp -a "$source_dir/dist/plymouth/Lyra-Enterprise" /usr/share/plymouth/themes/
+  sudo cp -a "$source_dir/dist/plymouth/Lyra-OS" /usr/share/plymouth/themes/
 fi
 command -v gtk-update-icon-cache >/dev/null 2>&1 && \
-  sudo gtk-update-icon-cache -f /usr/share/icons/Lyra-Enterprise-Icons >/dev/null || true
+  sudo gtk-update-icon-cache -f /usr/share/icons/Lyra-OS-Icons >/dev/null || true
 
 if ((activate)); then
   say 'Installing Lyra neofetch config'
@@ -194,29 +212,29 @@ if ((activate)) && command -v gsettings >/dev/null 2>&1; then
   else
     scheme=prefer-dark
   fi
-  say 'Activating Adwaita with Lyra Enterprise icons'
+  say 'Activating Adwaita with Lyra OS icons'
   gsettings reset org.gnome.shell.extensions.user-theme name 2>/dev/null || true
   gsettings reset org.gnome.desktop.interface gtk-theme 2>/dev/null || true
-  gsettings set org.gnome.desktop.interface icon-theme 'Lyra-Enterprise-Icons'
+  gsettings set org.gnome.desktop.interface icon-theme 'Lyra-OS-Icons'
   gsettings set org.gnome.desktop.interface accent-color 'blue' 2>/dev/null || true
   gsettings set org.gnome.desktop.interface color-scheme "$scheme"
   gsettings set org.gnome.desktop.background picture-uri \
-    'file:///usr/share/backgrounds/lyra/enterprise-light.png'
+    'file:///usr/share/backgrounds/lyra/os-light.png'
   gsettings set org.gnome.desktop.background picture-uri-dark \
-    'file:///usr/share/backgrounds/lyra/enterprise.png'
-  if [[ $(readlink "$HOME/.config/gtk-4.0/gtk.css" 2>/dev/null || true) == /usr/share/themes/Lyra-Enterprise* ]]; then
+    'file:///usr/share/backgrounds/lyra/os.png'
+  if [[ $(readlink "$HOME/.config/gtk-4.0/gtk.css" 2>/dev/null || true) == /usr/share/themes/Lyra-OS* ]]; then
     rm -f "$HOME/.config/gtk-4.0/gtk.css"
   fi
 fi
 
 if ((activate)) && ((grub)); then
   if [[ -f /etc/default/grub ]]; then
-    say 'Activating Lyra Enterprise for GRUB'
-    if ! sudo grep -qx 'GRUB_THEME="/usr/share/grub/themes/Lyra-Enterprise/theme.txt"' /etc/default/grub; then
+    say 'Activating Lyra OS for GRUB'
+    if ! sudo grep -qx 'GRUB_THEME="/usr/share/grub/themes/Lyra-OS/theme.txt"' /etc/default/grub; then
       sudo sh -c "grep '^[[:space:]]*GRUB_THEME=' /etc/default/grub > /etc/default/grub.lyra-theme-backup || true"
     fi
     sudo sed -i '/^[[:space:]]*GRUB_THEME=/d' /etc/default/grub
-    printf '%s\n' 'GRUB_THEME="/usr/share/grub/themes/Lyra-Enterprise/theme.txt"' | \
+    printf '%s\n' 'GRUB_THEME="/usr/share/grub/themes/Lyra-OS/theme.txt"' | \
       sudo tee -a /etc/default/grub >/dev/null
     rebuild_grub_config
   else
@@ -226,15 +244,51 @@ fi
 
 if ((activate)) && ((plymouth)); then
   if command -v plymouth-set-default-theme >/dev/null 2>&1; then
-    say 'Activating Lyra Enterprise for Plymouth'
+    say 'Activating Lyra OS for Plymouth'
     if [[ ! -s /etc/plymouth/lyra-theme-backup ]]; then
       plymouth-set-default-theme 2>/dev/null | sudo tee /etc/plymouth/lyra-theme-backup >/dev/null || true
     fi
-    sudo plymouth-set-default-theme -R Lyra-Enterprise
+    sudo plymouth-set-default-theme -R Lyra-OS
   else
     say 'plymouth-set-default-theme not found; Plymouth theme was installed but not activated'
   fi
 fi
 
-say 'Lyra Enterprise installation complete'
+if ((activate)) && ((gdm)); then
+  if command -v dconf >/dev/null 2>&1; then
+    say 'Activating Lyra OS for GDM'
+    shell_theme=Lyra-OS
+    scheme=prefer-dark
+    if [[ $variant == light ]]; then
+      shell_theme=Lyra-OS-Light
+      scheme=prefer-light
+    fi
+    if [[ ! -f /etc/dconf/profile/gdm ]]; then
+      printf 'user-db:user\nsystem-db:gdm\n' | sudo tee /etc/dconf/profile/gdm >/dev/null
+      sudo touch /etc/dconf/profile/gdm.lyra-theme-created
+    fi
+    sudo install -d /etc/dconf/db/gdm.d
+    sudo tee /etc/dconf/db/gdm.d/00-lyra-os >/dev/null <<EOF
+[org/gnome/desktop/interface]
+icon-theme='Lyra-OS-Icons'
+color-scheme='$scheme'
+
+[org/gnome/desktop/background]
+picture-uri='file:///usr/share/backgrounds/lyra/os-light.png'
+picture-uri-dark='file:///usr/share/backgrounds/lyra/os.png'
+picture-options='zoom'
+
+[org/gnome/shell]
+enabled-extensions=['user-theme@gnome-shell-extensions.gcampax.github.com']
+
+[org/gnome/shell/extensions/user-theme]
+name='$shell_theme'
+EOF
+    sudo dconf update
+  else
+    say 'dconf not found; GDM theme was not activated'
+  fi
+fi
+
+say 'Lyra OS installation complete'
 printf 'Adwaita remains active for GNOME Shell and applications; Lyra supplies the icons.\n'

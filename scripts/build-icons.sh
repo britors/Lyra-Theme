@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 root=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
-out="$root/dist/Lyra-Enterprise-Icons"
+out="$root/dist/Lyra-OS-Icons"
 rm -rf "$out"
 mkdir -p "$out/scalable"
 cp "$root/src/icons/index.theme" "$out/"
@@ -20,5 +20,5 @@ link_icon apps applications-system applications-other system-software-install
 link_icon apps org.gnome.Settings preferences-system org.gnome.Settings.Devel
 link_icon apps utilities-terminal org.gnome.Console org.gnome.Terminal
 link_icon status user-trash user-trash-full
-printf 'Built Lyra Enterprise Icons in %s\n' "$out"
+printf 'Built Lyra OS Icons in %s\n' "$out"
 

@@ -1,65 +1,61 @@
-# Empacotamento para o GitHub Actions (build direto da tag, sem depender do
-# _service do OBS) e para o gatilho do openSUSE Build Service
-# (home:rodrigosbrito:lyra/lyra-theme, ver .github/workflows/release-opensuse.yml).
-# Cópia de packaging/lyra-enterprise-theme.spec adaptada apenas no Source0 e
-# na preparação das fontes para o tarball "achatado" (sem diretório
-# versionado) que o workflow monta. O restante do spec é idêntico.
-%{!?version: %define version 0.0.0}
-
-Name:           lyra-enterprise-theme
-Version:        %{version}
+Name:           lyra-os-theme
+Version:        1.5.0
 Release:        1%{?dist}
 Summary:        Corporate GNOME, GRUB and Plymouth theme for Lyra OS
 License:        GPL-3.0-or-later AND LGPL-2.1-or-later
-URL:            https://github.com/britors/Lyra-Theme
-Source0:        lyra-theme-src.tar.gz
+URL:            https://github.com/britors/lyra-os-theme
+Source0:        %{name}-%{version}.tar.xz
 BuildArch:      noarch
 BuildRequires:  ImageMagick
 BuildRequires:  nodejs
 BuildRequires:  rsvg-convert
 BuildRequires:  sassc
-Requires:       lyra-enterprise-icons
+Requires:       lyra-os-icons
 Requires:       plymouth-plugin-script
 Requires(post): grub2
 Requires(preun): grub2
 Requires(post): plymouth-scripts
 Requires(preun): plymouth-scripts
+Requires(post): dconf
+Requires(preun): dconf
 Recommends:     fastfetch
+Recommends:     gnome-shell-extension-user-theme
 Suggests:       neofetch
 
 %description
 Corporate, flat GNOME 48+ theme with dark and light variants for GNOME Shell,
-GTK 4/libadwaita and GTK 3. Includes matching PNG and JPEG XL wallpapers, the
-Lyra Enterprise boot menu theme for GRUB 2, a matching Plymouth boot splash
-theme, plus Fastfetch and Neofetch configs with a Lyra ascii logo.
+GTK 4/libadwaita and GTK 3, also themed on the GDM login screen. Includes
+matching PNG and JPEG XL wallpapers, the Lyra OS boot menu theme for
+GRUB 2, a matching Plymouth boot splash theme, plus Fastfetch and Neofetch
+configs with a Lyra ascii logo.
 
 %prep
-%setup -q -c -n lyra-theme-src
+%autosetup
 
 %build
 ./scripts/build.sh
 
 %install
 install -d %{buildroot}%{_datadir}/themes
-cp -a dist/Lyra-Enterprise dist/Lyra-Enterprise-Light %{buildroot}%{_datadir}/themes/
+cp -a dist/Lyra-OS dist/Lyra-OS-Light %{buildroot}%{_datadir}/themes/
 
 install -d %{buildroot}%{_datadir}/backgrounds/lyra
 install -m 0644 dist/backgrounds/*.png dist/backgrounds/*.jxl \
   %{buildroot}%{_datadir}/backgrounds/lyra/
 
 install -d %{buildroot}%{_datadir}/gnome-background-properties
-install -m 0644 dist/gnome-background-properties/lyra-enterprise.xml \
+install -m 0644 dist/gnome-background-properties/lyra-os.xml \
   %{buildroot}%{_datadir}/gnome-background-properties/
 
 install -d %{buildroot}%{_datadir}/glib-2.0/schemas
-install -m 0644 src/defaults/99-lyra-enterprise.gschema.override \
+install -m 0644 src/defaults/99-lyra-os.gschema.override \
   %{buildroot}%{_datadir}/glib-2.0/schemas/
 
 install -d %{buildroot}%{_datadir}/grub/themes
-cp -a dist/grub/Lyra-Enterprise %{buildroot}%{_datadir}/grub/themes/
+cp -a dist/grub/Lyra-OS %{buildroot}%{_datadir}/grub/themes/
 
 install -d %{buildroot}%{_datadir}/plymouth/themes
-cp -a dist/plymouth/Lyra-Enterprise %{buildroot}%{_datadir}/plymouth/themes/
+cp -a dist/plymouth/Lyra-OS %{buildroot}%{_datadir}/plymouth/themes/
 
 install -d %{buildroot}%{_datadir}/%{name}/neofetch
 install -m 0644 dist/neofetch/config.conf \
@@ -81,7 +77,7 @@ install -m 0644 dist/fastfetch/config.jsonc \
 grub_default=%{_sysconfdir}/default/grub
 grub_backup=%{_localstatedir}/lib/%{name}/grub-theme.backup
 plymouth_backup=%{_localstatedir}/lib/%{name}/plymouth-theme.backup
-lyra_theme='GRUB_THEME="%{_datadir}/grub/themes/Lyra-Enterprise/theme.txt"'
+lyra_theme='GRUB_THEME="%{_datadir}/grub/themes/Lyra-OS/theme.txt"'
 
 install -d -m 0755 %{_localstatedir}/lib/%{name}
 
@@ -97,24 +93,53 @@ fi
 if [ "$1" -eq 1 ]; then
   %{_sbindir}/plymouth-set-default-theme > "$plymouth_backup" || :
 fi
-%{_sbindir}/plymouth-set-default-theme -R Lyra-Enterprise || :
+%{_sbindir}/plymouth-set-default-theme -R Lyra-OS || :
+
+gdm_profile=%{_sysconfdir}/dconf/profile/gdm
+gdm_profile_marker=%{_localstatedir}/lib/%{name}/gdm-profile-created
+gdm_db_dir=%{_sysconfdir}/dconf/db/gdm.d
+
+if [ ! -f "$gdm_profile" ]; then
+  install -d -m 0755 "$(dirname "$gdm_profile")"
+  printf 'user-db:user\nsystem-db:gdm\n' > "$gdm_profile"
+  touch "$gdm_profile_marker"
+fi
+
+install -d -m 0755 "$gdm_db_dir"
+cat > "$gdm_db_dir/00-lyra-os" <<'GDM_DCONF'
+[org/gnome/desktop/interface]
+icon-theme='Lyra-OS-Icons'
+color-scheme='prefer-dark'
+
+[org/gnome/desktop/background]
+picture-uri='file:///usr/share/backgrounds/lyra/os-light.png'
+picture-uri-dark='file:///usr/share/backgrounds/lyra/os.png'
+picture-options='zoom'
+
+[org/gnome/shell]
+enabled-extensions=['user-theme@gnome-shell-extensions.gcampax.github.com']
+
+[org/gnome/shell/extensions/user-theme]
+name='Lyra-OS'
+GDM_DCONF
+%{_bindir}/dconf update || :
 
 %preun
 if [ "$1" -eq 0 ]; then
   grub_default=%{_sysconfdir}/default/grub
   grub_backup=%{_localstatedir}/lib/%{name}/grub-theme.backup
   plymouth_backup=%{_localstatedir}/lib/%{name}/plymouth-theme.backup
-  lyra_theme='GRUB_THEME="%{_datadir}/grub/themes/Lyra-Enterprise/theme.txt"'
+  lyra_theme='GRUB_THEME="%{_datadir}/grub/themes/Lyra-OS/theme.txt"'
 
   if [ -f "$grub_default" ] && grep -Fqx "$lyra_theme" "$grub_default"; then
-    sed -i '\|^[[:space:]]*GRUB_THEME="/usr/share/grub/themes/Lyra-Enterprise/theme.txt"$|d' "$grub_default"
+    sed -i '\|^[[:space:]]*GRUB_THEME="/usr/share/grub/themes/Lyra-OS/theme.txt"$|d' "$grub_default"
     if [ -s "$grub_backup" ]; then
       cat "$grub_backup" >> "$grub_default"
     fi
     %{_sbindir}/grub2-mkconfig -o /boot/grub2/grub.cfg || :
   fi
 
-  if [ "$(%{_sbindir}/plymouth-set-default-theme 2>/dev/null)" = "Lyra-Enterprise" ]; then
+  if [ "$(%{_sbindir}/plymouth-set-default-theme 2>/dev/null)" = "Lyra-OS" ]; then
     if [ -s "$plymouth_backup" ]; then
       read -r previous_plymouth < "$plymouth_backup"
       %{_sbindir}/plymouth-set-default-theme -R "$previous_plymouth" || :
@@ -122,6 +147,15 @@ if [ "$1" -eq 0 ]; then
       %{_sbindir}/plymouth-set-default-theme -R --reset || :
     fi
   fi
+
+  gdm_profile=%{_sysconfdir}/dconf/profile/gdm
+  gdm_profile_marker=%{_localstatedir}/lib/%{name}/gdm-profile-created
+
+  rm -f %{_sysconfdir}/dconf/db/gdm.d/00-lyra-os
+  if [ -f "$gdm_profile_marker" ]; then
+    rm -f "$gdm_profile" "$gdm_profile_marker"
+  fi
+  %{_bindir}/dconf update || :
 
   rm -f "$grub_backup"
   rm -f "$plymouth_backup"
@@ -131,29 +165,29 @@ fi
 %files
 %license LICENSE src/gtk3/COPYING.LGPL
 %doc README.md src/gtk3/ATTRIBUTION.md
-%{_datadir}/themes/Lyra-Enterprise/
-%{_datadir}/themes/Lyra-Enterprise-Light/
+%{_datadir}/themes/Lyra-OS/
+%{_datadir}/themes/Lyra-OS-Light/
 # Explicit parent-directory entries below are required because none of
 # these come from a Requires of this package (no grub2/plymouth runtime
 # dependency, since the theme is meant to be optional on top of whatever
 # bootloader/splash the system already has), so nothing else is
-# guaranteed to own the parent dirs — the build's unowned-directory check
+# guaranteed to own the parent dirs — rpmbuild's unowned-directory check
 # fails without these.
 %dir %{_datadir}/backgrounds
 %dir %{_datadir}/backgrounds/lyra
-%{_datadir}/backgrounds/lyra/enterprise.png
-%{_datadir}/backgrounds/lyra/enterprise.jxl
-%{_datadir}/backgrounds/lyra/enterprise-light.png
-%{_datadir}/backgrounds/lyra/enterprise-light.jxl
+%{_datadir}/backgrounds/lyra/os.png
+%{_datadir}/backgrounds/lyra/os.jxl
+%{_datadir}/backgrounds/lyra/os-light.png
+%{_datadir}/backgrounds/lyra/os-light.jxl
 %dir %{_datadir}/gnome-background-properties
-%{_datadir}/gnome-background-properties/lyra-enterprise.xml
-%{_datadir}/glib-2.0/schemas/99-lyra-enterprise.gschema.override
+%{_datadir}/gnome-background-properties/lyra-os.xml
+%{_datadir}/glib-2.0/schemas/99-lyra-os.gschema.override
 %dir %{_datadir}/grub
 %dir %{_datadir}/grub/themes
-%{_datadir}/grub/themes/Lyra-Enterprise/
+%{_datadir}/grub/themes/Lyra-OS/
 %dir %{_datadir}/plymouth
 %dir %{_datadir}/plymouth/themes
-%{_datadir}/plymouth/themes/Lyra-Enterprise/
+%{_datadir}/plymouth/themes/Lyra-OS/
 %dir %{_datadir}/%{name}
 %dir %{_datadir}/%{name}/neofetch
 %{_datadir}/%{name}/neofetch/config.conf
@@ -167,3 +201,23 @@ fi
 %config(noreplace) %{_sysconfdir}/skel/.config/fastfetch/config.jsonc
 
 %changelog
+* Fri Jul 24 2026 Lyra OS Team <rodrigo@w3ti.com.br> - 1.5.0-1
+- Theme the GDM login screen (icons, wallpaper and Shell colors) via a
+  dconf gdm profile
+
+* Thu Jul 23 2026 Lyra OS Team <rodrigo@w3ti.com.br> - 1.4.0-1
+- Add Plymouth boot theme matching GRUB, and a neofetch config with a Lyra
+  ascii logo
+- Drop KDE Plasma/Konsole and XFCE support to focus on GNOME
+
+* Tue Jul 21 2026 Lyra OS Team <rodrigo@w3ti.com.br> - 1.3.0-1
+- Add xfwm4 window theme and xfce4-terminal color scheme for XFCE
+
+* Tue Jul 21 2026 Lyra OS Team <rodrigo@w3ti.com.br> - 1.2.0-1
+- Add Plasma color schemes and matching Konsole color schemes for KDE
+
+* Sun Jul 19 2026 Lyra OS Team <rodrigo@w3ti.com.br> - 1.1.0-1
+- Keep Adwaita active by default and add the GRUB theme
+
+* Sun Jul 19 2026 Lyra OS Team <rodrigo@w3ti.com.br> - 1.0.0-1
+- Initial RPM package with dark and light variants

@@ -7,7 +7,7 @@ variant=dark
 
 usage() {
   cat <<'EOF'
-Lyra Enterprise RPM installer
+Lyra OS RPM installer
 
 Usage: install-rpm.sh [--dark|--light]
 
@@ -31,7 +31,6 @@ die() { printf '\033[1;31merror:\033[0m %s\n' "$*" >&2; exit 1; }
 
 command -v zypper >/dev/null 2>&1 || die 'This installer supports openSUSE (zypper) only.'
 command -v sudo >/dev/null 2>&1 || die 'sudo is required'
-command -v curl >/dev/null 2>&1 || die 'curl is required'
 
 if ! sudo -n true 2>/dev/null; then
   say 'Administrator authentication is required'
@@ -47,9 +46,11 @@ sudo zypper --gpg-auto-import-keys refresh "$repo_alias"
 
 say 'Installing the Lyra theme and icon packages'
 sudo zypper --non-interactive install \
-  lyra-enterprise-theme lyra-enterprise-icons
+  curl fastfetch glib2-tools gnome-shell-extension-user-theme \
+  lyra-os-theme lyra-os-icons
+command -v curl >/dev/null 2>&1 || die 'curl was not installed'
 
-fastfetch_share=/usr/share/lyra-enterprise-theme/fastfetch
+fastfetch_share=/usr/share/lyra-os-theme/fastfetch
 if [[ ! -f "$fastfetch_share/config.jsonc" || \
       ! -f "$fastfetch_share/logo.txt" ]]; then
   say 'Installing the Lyra Fastfetch assets'
@@ -68,7 +69,7 @@ fi
 
 if command -v gsettings >/dev/null 2>&1; then
   say 'Activating Lyra icons and wallpapers'
-  gsettings set org.gnome.desktop.interface icon-theme 'Lyra-Enterprise-Icons'
+  gsettings set org.gnome.desktop.interface icon-theme 'Lyra-OS-Icons'
   gsettings set org.gnome.desktop.interface accent-color 'blue' 2>/dev/null || true
 
   if [[ $variant == light ]]; then
@@ -78,14 +79,14 @@ if command -v gsettings >/dev/null 2>&1; then
   fi
 
   gsettings set org.gnome.desktop.background picture-uri \
-    'file:///usr/share/backgrounds/lyra/enterprise-light.png'
+    'file:///usr/share/backgrounds/lyra/os-light.png'
   gsettings set org.gnome.desktop.background picture-uri-dark \
-    'file:///usr/share/backgrounds/lyra/enterprise.png'
+    'file:///usr/share/backgrounds/lyra/os.png'
 else
   say 'gsettings not found; GNOME will use the packaged defaults on a new profile'
 fi
 
-if [[ -f /usr/share/lyra-enterprise-theme/neofetch/config.conf ]]; then
+if [[ -f /usr/share/lyra-os-theme/neofetch/config.conf ]]; then
   say 'Activating the Lyra Neofetch configuration'
   mkdir -p "$HOME/.config/neofetch"
   if [[ -f "$HOME/.config/neofetch/config.conf" && \
@@ -93,11 +94,11 @@ if [[ -f /usr/share/lyra-enterprise-theme/neofetch/config.conf ]]; then
     cp "$HOME/.config/neofetch/config.conf" \
       "$HOME/.config/neofetch/config.conf.lyra-theme-backup"
   fi
-  cp /usr/share/lyra-enterprise-theme/neofetch/config.conf \
+  cp /usr/share/lyra-os-theme/neofetch/config.conf \
     "$HOME/.config/neofetch/config.conf"
 fi
 
-if [[ -f /usr/share/lyra-enterprise-theme/fastfetch/config.jsonc ]]; then
+if [[ -f /usr/share/lyra-os-theme/fastfetch/config.jsonc ]]; then
   say 'Activating the Lyra Fastfetch configuration'
   mkdir -p "$HOME/.config/fastfetch"
   if [[ -f "$HOME/.config/fastfetch/config.jsonc" && \
@@ -105,7 +106,7 @@ if [[ -f /usr/share/lyra-enterprise-theme/fastfetch/config.jsonc ]]; then
     cp "$HOME/.config/fastfetch/config.jsonc" \
       "$HOME/.config/fastfetch/config.jsonc.lyra-theme-backup"
   fi
-  cp /usr/share/lyra-enterprise-theme/fastfetch/config.jsonc \
+  cp /usr/share/lyra-os-theme/fastfetch/config.jsonc \
     "$HOME/.config/fastfetch/config.jsonc"
 fi
 
@@ -113,14 +114,46 @@ if [[ -f /etc/default/grub ]]; then
   say 'Confirming the Lyra GRUB theme'
   sudo sed -i '/^[[:space:]]*GRUB_THEME=/d' /etc/default/grub
   printf '%s\n' \
-    'GRUB_THEME="/usr/share/grub/themes/Lyra-Enterprise/theme.txt"' |
+    'GRUB_THEME="/usr/share/grub/themes/Lyra-OS/theme.txt"' |
     sudo tee -a /etc/default/grub >/dev/null
   sudo grub2-mkconfig -o /boot/grub2/grub.cfg
 fi
 
 if command -v plymouth-set-default-theme >/dev/null 2>&1; then
   say 'Confirming the Lyra Plymouth theme'
-  sudo plymouth-set-default-theme -R Lyra-Enterprise
+  sudo plymouth-set-default-theme -R Lyra-OS
 fi
 
-say 'Lyra Enterprise is installed and active'
+if command -v dconf >/dev/null 2>&1; then
+  say 'Confirming the Lyra GDM theme'
+  shell_theme=Lyra-OS
+  scheme=prefer-dark
+  if [[ $variant == light ]]; then
+    shell_theme=Lyra-OS-Light
+    scheme=prefer-light
+  fi
+  if [[ ! -f /etc/dconf/profile/gdm ]]; then
+    printf 'user-db:user\nsystem-db:gdm\n' | sudo tee /etc/dconf/profile/gdm >/dev/null
+    sudo touch /etc/dconf/profile/gdm.lyra-theme-created
+  fi
+  sudo install -d /etc/dconf/db/gdm.d
+  sudo tee /etc/dconf/db/gdm.d/00-lyra-os >/dev/null <<EOF
+[org/gnome/desktop/interface]
+icon-theme='Lyra-OS-Icons'
+color-scheme='$scheme'
+
+[org/gnome/desktop/background]
+picture-uri='file:///usr/share/backgrounds/lyra/os-light.png'
+picture-uri-dark='file:///usr/share/backgrounds/lyra/os.png'
+picture-options='zoom'
+
+[org/gnome/shell]
+enabled-extensions=['user-theme@gnome-shell-extensions.gcampax.github.com']
+
+[org/gnome/shell/extensions/user-theme]
+name='$shell_theme'
+EOF
+  sudo dconf update
+fi
+
+say 'Lyra OS is installed and active'

@@ -1,4 +1,4 @@
-# Lyra Enterprise GRUB theme — designed for 1920x1080 and scalable layouts.
+# Lyra OS GRUB theme — designed for 1920x1080 and scalable layouts.
 title-text: ""
 desktop-image: "background.png"
 desktop-color: "#0b1018"
