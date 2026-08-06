@@ -28,7 +28,12 @@ jobs:
         run: |
           version="${GITHUB_REF_NAME#v}"
           rpmdev-setuptree
-          tar czf "$HOME/rpmbuild/SOURCES/lyra-theme-src.tar.gz" \
+          # Os specs usam a mesma nomenclatura versionada do serviço tar_scm
+          # no OBS. Substituir a versão literal apenas na cópia usada pelo
+          # rpmbuild mantém o spec compatível com o serviço set_version.
+          sed -i -E "s/^Version:[[:space:]]+.*/Version:        $version/" \
+            packaging/opensuse/lyra-os-theme.spec packaging/opensuse/lyra-os-icons.spec
+          tar czf "$HOME/rpmbuild/SOURCES/lyra-theme-src-$version.tar.gz" \
             --exclude='.git' \
             --exclude='dist' \
             --exclude='Lyra-OS.tar.xz' \

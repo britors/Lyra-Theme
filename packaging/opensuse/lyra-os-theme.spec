@@ -3,16 +3,16 @@
 # (home:rodrigosbrito:lyra/lyra-theme, ver .github/workflows/release-opensuse.yml).
 # Cópia de packaging/lyra-os-theme.spec adaptada apenas no Source0 e
 # na preparação das fontes para o tarball "achatado" (sem diretório
-# versionado) que o workflow monta. O restante do spec é idêntico.
-%{!?version: %define version 0.0.0}
+# versionado dentro do arquivo) que o workflow monta. O restante do spec é
+# idêntico.
 
 Name:           lyra-os-theme
-Version:        %{version}
+Version:        0.0.0
 Release:        1%{?dist}
 Summary:        Corporate GNOME, GRUB and Plymouth theme for Lyra OS
 License:        GPL-3.0-or-later AND LGPL-2.1-or-later
 URL:            https://github.com/britors/Lyra-Theme
-Source0:        lyra-theme-src.tar.gz
+Source0:        lyra-theme-src-%{version}.tar.gz
 BuildArch:      noarch
 BuildRequires:  ImageMagick
 BuildRequires:  nodejs
@@ -41,7 +41,7 @@ GRUB 2, a matching Plymouth boot splash theme, plus Fastfetch and Neofetch
 configs with a Lyra ascii logo.
 
 %prep
-%setup -q -c -n lyra-theme-src
+%setup -q -c -n lyra-theme-src-%{version}
 
 %build
 ./scripts/build.sh
