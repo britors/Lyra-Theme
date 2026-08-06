@@ -75,7 +75,7 @@ for variant in Lyra-OS Lyra-OS-Light; do
 done
 mkdir -p "$dist/backgrounds" "$dist/gnome-background-properties"
 mkdir -p "$dist/grub/Lyra-OS"
-mkdir -p "$dist/neofetch" "$dist/fastfetch"
+mkdir -p "$dist/neofetch" "$dist/fastfetch" "$dist/gdm"
 
 compile_scss "$root/src/shell/_tokens-dark.scss" "$root/src/shell/gnome-shell.scss" \
   "$dist/Lyra-OS/gnome-shell/gnome-shell.css"
@@ -88,6 +88,7 @@ cp "$root/src/gtk4/gtk-light.css" "$dist/Lyra-OS-Light/gtk-4.0/gtk.css"
 cp "$root/src/neofetch/config.conf" "$dist/neofetch/"
 cp "$root/src/fastfetch/config.jsonc" "$root/src/fastfetch/logo.txt" \
   "$dist/fastfetch/"
+cp "$root/src/gdm/logo.svg" "$dist/gdm/"
 
 render_wallpaper "$root/src/shell/_tokens-dark.scss" os
 render_wallpaper "$root/src/shell/_tokens-light.scss" os-light

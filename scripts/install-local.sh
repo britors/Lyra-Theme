@@ -160,7 +160,7 @@ say 'Building theme, icons, wallpapers, GRUB theme and Plymouth theme'
 say 'Installing system files'
 sudo install -d /usr/share/themes /usr/share/icons \
   /usr/share/backgrounds/lyra /usr/share/gnome-background-properties \
-  /usr/share/lyra-os-theme/fastfetch
+  /usr/share/lyra-os-theme/fastfetch /usr/share/lyra-os-theme/gdm
 sudo cp -a "$root/dist/Lyra-OS" \
   "$root/dist/Lyra-OS-Light" /usr/share/themes/
 sudo cp -a "$root/dist/Lyra-OS-Icons" /usr/share/icons/
@@ -172,6 +172,8 @@ sudo install -m 0644 \
 sudo install -m 0644 "$root/dist/fastfetch/config.jsonc" \
   "$root/dist/fastfetch/logo.txt" \
   /usr/share/lyra-os-theme/fastfetch/
+sudo install -m 0644 "$root/dist/gdm/logo.svg" \
+  /usr/share/lyra-os-theme/gdm/logo.svg
 if ((grub)); then
   sudo install -d /usr/share/grub/themes
   sudo cp -a "$root/dist/grub/Lyra-OS" /usr/share/grub/themes/
@@ -282,6 +284,7 @@ if ((activate)) && ((gdm)); then
       sudo touch /etc/dconf/profile/gdm.lyra-theme-created
     fi
     sudo install -d /etc/dconf/db/gdm.d
+    sudo rm -f /etc/dconf/db/gdm.d/00-lyra-enterprise
     sudo tee /etc/dconf/db/gdm.d/00-lyra-os >/dev/null <<EOF
 [org/gnome/desktop/interface]
 icon-theme='Lyra-OS-Icons'
@@ -297,6 +300,10 @@ enabled-extensions=['user-theme@gnome-shell-extensions.gcampax.github.com']
 
 [org/gnome/shell/extensions/user-theme]
 name='$shell_theme'
+
+[org/gnome/login-screen]
+logo='/usr/share/lyra-os-theme/gdm/logo.svg'
+fallback-logo=''
 EOF
     sudo dconf update
   else
