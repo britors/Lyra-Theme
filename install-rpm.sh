@@ -137,6 +137,7 @@ if command -v dconf >/dev/null 2>&1; then
     sudo touch /etc/dconf/profile/gdm.lyra-theme-created
   fi
   sudo install -d /etc/dconf/db/gdm.d
+  sudo rm -f /etc/dconf/db/gdm.d/00-lyra-enterprise
   sudo tee /etc/dconf/db/gdm.d/00-lyra-os >/dev/null <<EOF
 [org/gnome/desktop/interface]
 icon-theme='Lyra-OS-Icons'
@@ -152,6 +153,10 @@ enabled-extensions=['user-theme@gnome-shell-extensions.gcampax.github.com']
 
 [org/gnome/shell/extensions/user-theme]
 name='$shell_theme'
+
+[org/gnome/login-screen]
+logo='/usr/share/lyra-os-theme/gdm/logo.svg'
+fallback-logo=''
 EOF
   sudo dconf update
 fi

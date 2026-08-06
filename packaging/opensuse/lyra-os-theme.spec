@@ -73,6 +73,10 @@ install -d %{buildroot}%{_datadir}/%{name}/fastfetch
 install -m 0644 dist/fastfetch/config.jsonc dist/fastfetch/logo.txt \
   %{buildroot}%{_datadir}/%{name}/fastfetch/
 
+install -d %{buildroot}%{_datadir}/%{name}/gdm
+install -m 0644 dist/gdm/logo.svg \
+  %{buildroot}%{_datadir}/%{name}/gdm/logo.svg
+
 install -d %{buildroot}%{_sysconfdir}/skel/.config/neofetch
 install -m 0644 dist/neofetch/config.conf \
   %{buildroot}%{_sysconfdir}/skel/.config/neofetch/config.conf
@@ -114,6 +118,7 @@ if [ ! -f "$gdm_profile" ]; then
 fi
 
 install -d -m 0755 "$gdm_db_dir"
+rm -f "$gdm_db_dir/00-lyra-enterprise"
 cat > "$gdm_db_dir/00-lyra-os" <<'GDM_DCONF'
 [org/gnome/desktop/interface]
 icon-theme='Lyra-OS-Icons'
@@ -129,6 +134,10 @@ enabled-extensions=['user-theme@gnome-shell-extensions.gcampax.github.com']
 
 [org/gnome/shell/extensions/user-theme]
 name='Lyra-OS'
+
+[org/gnome/login-screen]
+logo='/usr/share/lyra-os-theme/gdm/logo.svg'
+fallback-logo=''
 GDM_DCONF
 %{_bindir}/dconf update || :
 
@@ -202,6 +211,8 @@ fi
 %dir %{_datadir}/%{name}/fastfetch
 %{_datadir}/%{name}/fastfetch/config.jsonc
 %{_datadir}/%{name}/fastfetch/logo.txt
+%dir %{_datadir}/%{name}/gdm
+%{_datadir}/%{name}/gdm/logo.svg
 %dir %{_sysconfdir}/skel/.config
 %dir %{_sysconfdir}/skel/.config/neofetch
 %config(noreplace) %{_sysconfdir}/skel/.config/neofetch/config.conf
