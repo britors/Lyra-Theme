@@ -4,5 +4,6 @@ root=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 "$root/scripts/build.sh"
 archive="$root/Lyra-OS.tar.xz"
 rm -f "$archive"
-tar -C "$root/dist" -cJf "$archive" Lyra-OS Lyra-OS-Light backgrounds gnome-background-properties grub plymouth neofetch fastfetch
+tar -C "$root/dist" -cJf "$archive" Lyra-OS Lyra-OS-Light backgrounds \
+  gnome-background-properties grub plymouth dracut neofetch fastfetch
 printf 'Created %s\n' "$archive"

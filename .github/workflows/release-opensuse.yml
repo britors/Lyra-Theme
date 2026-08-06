@@ -49,6 +49,10 @@ jobs:
           test -f /usr/share/themes/Lyra-OS/gnome-shell/gnome-shell.css
           test -f /usr/share/themes/Lyra-OS-Light/gnome-shell/gnome-shell.css
           test -f /usr/share/plymouth/themes/Lyra-OS/Lyra-OS.plymouth
+          test -f /usr/share/plymouth/themes/Lyra-OS/watermark.png
+          grep -Fqx 'ModuleName=two-step' \
+            /usr/share/plymouth/themes/Lyra-OS/Lyra-OS.plymouth
+          test -x /usr/lib/dracut/modules.d/51lyra-plymouth/module-setup.sh
           test -f /usr/share/grub/themes/Lyra-OS/theme.txt
           test -d /usr/share/icons/Lyra-OS-Icons
           test -f /usr/share/glib-2.0/schemas/99-lyra-os.gschema.override

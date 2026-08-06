@@ -11,7 +11,10 @@ BuildRequires:  nodejs
 BuildRequires:  rsvg-convert
 BuildRequires:  sassc
 Requires:       lyra-os-icons
-Requires:       plymouth-plugin-script
+Requires:       cantarell-fonts
+Requires:       dracut
+Requires:       plymouth-plugin-two-step
+Requires:       plymouth-theme-spinner
 Requires(post): grub2
 Requires(preun): grub2
 Requires(post): plymouth-scripts
@@ -56,6 +59,10 @@ cp -a dist/grub/Lyra-OS %{buildroot}%{_datadir}/grub/themes/
 
 install -d %{buildroot}%{_datadir}/plymouth/themes
 cp -a dist/plymouth/Lyra-OS %{buildroot}%{_datadir}/plymouth/themes/
+
+install -d %{buildroot}%{_prefix}/lib/dracut/modules.d/51lyra-plymouth
+install -m 0755 dist/dracut/51lyra-plymouth/module-setup.sh \
+  %{buildroot}%{_prefix}/lib/dracut/modules.d/51lyra-plymouth/module-setup.sh
 
 install -d %{buildroot}%{_datadir}/%{name}/neofetch
 install -m 0644 dist/neofetch/config.conf \
@@ -197,6 +204,7 @@ fi
 %dir %{_datadir}/plymouth
 %dir %{_datadir}/plymouth/themes
 %{_datadir}/plymouth/themes/Lyra-OS/
+%{_prefix}/lib/dracut/modules.d/51lyra-plymouth/
 %dir %{_datadir}/%{name}
 %dir %{_datadir}/%{name}/neofetch
 %{_datadir}/%{name}/neofetch/config.conf
