@@ -1,8 +1,59 @@
 [Plymouth Theme]
 Name=Lyra OS
-Description=Corporate boot splash for Lyra OS, matching the GRUB boot theme
-ModuleName=script
+Description=Lyra OS boot splash integrated with the firmware BGRT background
+ModuleName=two-step
 
-[script]
-ImageDir=/usr/share/plymouth/themes/Lyra-OS
-ScriptFile=/usr/share/plymouth/themes/Lyra-OS/lyra-os.script
+[two-step]
+Font=Cantarell 12
+TitleFont=Cantarell Light 30
+ImageDir=/usr/share/plymouth/themes/spinner
+WatermarkPath=/usr/share/plymouth/themes/Lyra-OS/watermark.png
+DialogHorizontalAlignment=.5
+DialogVerticalAlignment=.382
+TitleHorizontalAlignment=.5
+TitleVerticalAlignment=.382
+HorizontalAlignment=.5
+VerticalAlignment=.7
+WatermarkHorizontalAlignment=.5
+WatermarkVerticalAlignment=.96
+Transition=none
+TransitionDuration=0.0
+BackgroundStartColor=0x0b1018
+BackgroundEndColor=0x0b1018
+ProgressBarBackgroundColor=0x26364c
+ProgressBarForegroundColor=0x3b82f6
+MessageBelowAnimation=true
+DialogClearsFirmwareBackground=true
+
+[boot-up]
+UseEndAnimation=false
+UseFirmwareBackground=true
+
+[shutdown]
+UseEndAnimation=false
+UseFirmwareBackground=true
+
+[reboot]
+UseEndAnimation=false
+UseFirmwareBackground=true
+
+[updates]
+SuppressMessages=true
+ProgressBarShowPercentComplete=true
+UseProgressBar=true
+Title=Installing Updates...
+SubTitle=Do not turn off your computer
+
+[system-upgrade]
+SuppressMessages=true
+ProgressBarShowPercentComplete=true
+UseProgressBar=true
+Title=Upgrading System...
+SubTitle=Do not turn off your computer
+
+[firmware-upgrade]
+SuppressMessages=true
+ProgressBarShowPercentComplete=true
+UseProgressBar=true
+Title=Upgrading Firmware...
+SubTitle=Do not turn off your computer

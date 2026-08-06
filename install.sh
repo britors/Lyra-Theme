@@ -70,6 +70,7 @@ if ((uninstall)); then
     /usr/share/icons/Lyra-OS-Icons \
     /usr/share/grub/themes/Lyra-OS \
     /usr/share/plymouth/themes/Lyra-OS \
+    /usr/lib/dracut/modules.d/51lyra-plymouth \
     /usr/share/lyra-os-theme
   sudo rm -f /usr/share/backgrounds/lyra/os.png \
     /usr/share/backgrounds/lyra/os-light.png \
@@ -133,7 +134,10 @@ install_dependencies() {
     ImageMagick nodejs rsvg-convert sassc tar xz
   )
   ((grub)) && packages+=(grub2)
-  ((plymouth)) && packages+=(plymouth-plugin-script plymouth-scripts)
+  ((plymouth)) && packages+=(
+    cantarell-fonts dracut plymouth-plugin-two-step plymouth-scripts
+    plymouth-theme-spinner
+  )
   ((gdm)) && packages+=(dconf gnome-shell-extension-user-theme)
   sudo zypper --non-interactive install "${packages[@]}"
 }
@@ -183,6 +187,9 @@ fi
 if ((plymouth)); then
   sudo install -d /usr/share/plymouth/themes
   sudo cp -a "$source_dir/dist/plymouth/Lyra-OS" /usr/share/plymouth/themes/
+  sudo install -d /usr/lib/dracut/modules.d/51lyra-plymouth
+  sudo install -m 0755 "$source_dir/dist/dracut/51lyra-plymouth/module-setup.sh" \
+    /usr/lib/dracut/modules.d/51lyra-plymouth/module-setup.sh
 fi
 command -v gtk-update-icon-cache >/dev/null 2>&1 && \
   sudo gtk-update-icon-cache -f /usr/share/icons/Lyra-OS-Icons >/dev/null || true

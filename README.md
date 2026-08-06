@@ -87,7 +87,8 @@ curl --proto '=https' --tlsv1.2 -fsSL \
 - `curl`, `tar`, `gzip`, `xz`, `sassc`, Node.js, `rsvg-convert` e ImageMagick
   7 com suporte a JXL
 - `glib2-tools`, `gtk3-tools`, `adwaita-icon-theme` e `fastfetch`
-- `grub2`, `plymouth-scripts` e `plymouth-plugin-script` para os temas de boot
+- `grub2`, `plymouth-scripts`, `plymouth-plugin-two-step`,
+  `plymouth-theme-spinner`, `cantarell-fonts` e `dracut` para os temas de boot
 - `dconf` e `gnome-shell-extension-user-theme` para o tema do GDM
 
 O instalador resolve esses pacotes automaticamente via `zypper`.
@@ -133,6 +134,9 @@ sudo install -m 0644 dist/gnome-background-properties/lyra-os.xml \
   /usr/share/gnome-background-properties/
 sudo cp -a dist/grub/Lyra-OS /usr/share/grub/themes/
 sudo cp -a dist/plymouth/Lyra-OS /usr/share/plymouth/themes/
+sudo install -d /usr/lib/dracut/modules.d/51lyra-plymouth
+sudo install -m 0755 dist/dracut/51lyra-plymouth/module-setup.sh \
+  /usr/lib/dracut/modules.d/51lyra-plymouth/module-setup.sh
 sudo cp -a dist/fastfetch/. /usr/share/lyra-os-theme/fastfetch/
 mkdir -p ~/.config/neofetch
 cp dist/neofetch/config.conf ~/.config/neofetch/config.conf
@@ -187,6 +191,12 @@ manualmente:
 ```bash
 sudo plymouth-set-default-theme -R Lyra-OS
 ```
+
+O splash usa o fundo BGRT fornecido pelo firmware, mantém o logotipo do
+fabricante, posiciona a animação abaixo dele e mostra a marca Lyra OS no
+rodapé. Quando BGRT não está disponível, usa `#0b1018` como fundo. O módulo
+Dracut incluído garante que `label-pango.so` seja copiado para o initramfs no
+openSUSE, evitando quadrados no lugar das mensagens e do prompt de senha.
 
 ### GDM
 
@@ -280,7 +290,7 @@ src/gtk3/        port GTK 3 e atribuição LGPL
 src/icons/       tema de ícones SVG
 src/wallpaper/   fonte vetorial e metadados GNOME
 src/grub/        tema, fundo e seleção do menu GRUB
-src/plymouth/    script, logo e barra de progresso do tema Plymouth
+src/plymouth/    configuração BGRT e integração Dracut do tema Plymouth
 src/neofetch/    config do neofetch com logo ascii da Lyra
 src/fastfetch/   config e logo ascii para o Fastfetch
 scripts/         build, validação e empacotamento
