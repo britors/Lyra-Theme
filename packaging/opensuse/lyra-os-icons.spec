@@ -1,14 +1,12 @@
 # Ver lyra-os-theme.spec neste mesmo diretório para as notas gerais
 # (por que esta cópia existe, separada de packaging/lyra-os-icons.spec).
-%{!?version: %define version 0.0.0}
-
 Name:           lyra-os-icons
-Version:        %{version}
+Version:        0.0.0
 Release:        1%{?dist}
 Summary:        Flat sapphire icon theme for Lyra OS
 License:        GPL-3.0-or-later
 URL:            https://github.com/britors/Lyra-Theme
-Source0:        lyra-theme-src.tar.gz
+Source0:        lyra-theme-src-%{version}.tar.gz
 BuildArch:      noarch
 Requires:       adwaita-icon-theme
 
@@ -17,7 +15,7 @@ Icon theme for Lyra OS. It provides branded vector icons for common
 places, devices and applications and inherits Adwaita for complete GNOME coverage.
 
 %prep
-%setup -q -c -n lyra-theme-src
+%setup -q -c -n lyra-theme-src-%{version}
 
 %build
 ./scripts/build-icons.sh
