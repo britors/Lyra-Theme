@@ -6,7 +6,11 @@ License:        GPL-3.0-or-later AND LGPL-2.1-or-later
 URL:            https://github.com/britors/lyra-os-theme
 Source0:        %{name}-%{version}.tar.xz
 BuildArch:      noarch
+# cantarell-fonts também precisa estar disponível em build time: o texto
+# "LYRA OS" do watermark do Plymouth/GDM vem de um <text> no logo.svg,
+# rasterizado por rsvg-convert durante o build (não em runtime).
 BuildRequires:  ImageMagick
+BuildRequires:  cantarell-fonts
 BuildRequires:  nodejs
 BuildRequires:  rsvg-convert
 BuildRequires:  sassc
@@ -139,6 +143,45 @@ logo='/usr/share/lyra-os-theme/gdm/logo.svg'
 fallback-logo=''
 GDM_DCONF
 %{_bindir}/dconf update || :
+
+# Migrate the pre-rename icon-theme value ('Lyra-Enterprise-Icons') that
+# earlier package versions left behind in already-logged-in users' own
+# dconf db. The compiled gschema override above only supplies the default
+# for sessions with no explicit value, so it can't reach users who already
+# have the stale name recorded. Only sessions whose icon-theme is exactly
+# the stale value are touched, so a user's deliberate choice of a
+# different icon theme is never overwritten. A gsettings write via
+# runuser+D-Bus can silently no-op if the target bus isn't actually
+# reachable, so every write is read back and a failure is logged instead
+# of assumed fixed.
+stale_icon_theme='Lyra-Enterprise-Icons'
+new_icon_theme='Lyra-OS-Icons'
+%{_bindir}/loginctl list-sessions --no-legend 2>/dev/null | while read -r session_id session_uid session_user _; do
+  [ "$(%{_bindir}/loginctl show-session "$session_id" -p Class --value 2>/dev/null)" = user ] || continue
+  session_bus="/run/user/$session_uid/bus"
+  [ -S "$session_bus" ] || continue
+
+  current=$(%{_sbindir}/runuser -u "$session_user" -- env \
+    XDG_RUNTIME_DIR="/run/user/$session_uid" \
+    DBUS_SESSION_BUS_ADDRESS="unix:path=$session_bus" \
+    %{_bindir}/gsettings get org.gnome.desktop.interface icon-theme 2>/dev/null || :)
+  [ "$current" = "'$stale_icon_theme'" ] || continue
+
+  %{_sbindir}/runuser -u "$session_user" -- env \
+    XDG_RUNTIME_DIR="/run/user/$session_uid" \
+    DBUS_SESSION_BUS_ADDRESS="unix:path=$session_bus" \
+    %{_bindir}/gsettings set org.gnome.desktop.interface icon-theme "$new_icon_theme" || :
+
+  applied=$(%{_sbindir}/runuser -u "$session_user" -- env \
+    XDG_RUNTIME_DIR="/run/user/$session_uid" \
+    DBUS_SESSION_BUS_ADDRESS="unix:path=$session_bus" \
+    %{_bindir}/gsettings get org.gnome.desktop.interface icon-theme 2>/dev/null || :)
+  if [ "$applied" = "'$new_icon_theme'" ]; then
+    echo "lyra-os-theme: icon-theme obsoleto corrigido para $session_user (sessão $session_id)"
+  else
+    echo "lyra-os-theme: aviso: não foi possível corrigir o icon-theme de $session_user (sessão $session_id); rode manualmente: gsettings set org.gnome.desktop.interface icon-theme '$new_icon_theme'" >&2
+  fi
+done || :
 
 %preun
 if [ "$1" -eq 0 ]; then
