@@ -5,7 +5,7 @@ jobs:
     runs-on: ubuntu-latest
     container: opensuse/tumbleweed:latest
     steps:
-      - run: zypper --non-interactive install tar xz git sassc ImageMagick nodejs rsvg-convert
+      - run: zypper --non-interactive install tar xz git sassc ImageMagick nodejs rsvg-convert cantarell-fonts
       - uses: actions/checkout@v4
       - run: ./scripts/build.sh
       - run: |
